@@ -177,10 +177,9 @@
                                                         <td>Gross Monthly Salary</td>
                                                         <td class="text-end fw-bold" id="old-gross-total"></td>
                                                         <td class="text-end fw-bold" id="new-gross-total"></td>
-                                                        <td class="increase-cell fw-bold text-end"
-                                                            id="gross-total-increase">
-                                                        </td>
-                                                        <td class="increase-cell fw-bold text-end"
+                                                        <td class="increase-cell text-end fw-bold"
+                                                            id="gross-total-increase"></td>
+                                                        <td class="increase-cell text-end fw-bold"
                                                             id="gross-total-growth"></td>
                                                     </tr>
                                                 </tfoot>
@@ -608,6 +607,7 @@
                 </div>
                 <div class="modal-body small-muted">
                     <p>GIPSA wage revision calculator 2025</p>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -864,26 +864,29 @@
         const npsEmployerContArrear = document.getElementById('nps-employer-cont-arrear');
         const npsTotalRetainedArrear = document.getElementById('nps-total-retained-arrear');
 
-        // === CONSTANTS ===
+
+        // --- HELPER FUNCTIONS ---
+        // Formats a number to Indian currency format (lakhs/crores) with 0 decimal places.
+        const f = (val) => Math.round(val).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        // Formats a float number for the tax summary
+        const f_float = (val) => val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        // Parses date strings to YYYY-MM-DD for consistency
+        const dateToYMD = (date) => date.toISOString().slice(0, 10);
+        // Date constants
         const EFFECTIVE_START_DATE = new Date('2022-08-01');
         const TODAY = new Date();
-        const OFFICER_TQ_EFFECTIVE_DATE = new Date('2025-10-01');
+        const OFFICER_TQ_EFFECTIVE_DATE = new Date('2025-10-01'); // Officer TQ effective date
 
-        // === FORMATTERS ===
-        const formatCurrency = (val) =>
-            Math.round(val).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-
-        const formatFloat = (val) =>
-            Number(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-        const dateToYMD = (date) => date.toISOString().slice(0, 10);
-
-        // === UI HELPERS ===
+        // Shows a temporary message box.
         function showMessage(message) {
             messageBox.textContent = message;
-            messageBox.classList.remove('d-none');
-            setTimeout(() => messageBox.classList.add('d-none'), 3000);
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
         }
+
+        // Creates a checkbox element for an allowance.
         function createCheckbox(name, amounts) {
             const id = `allowance-${name.replace(/[\s/()]+/g, '-')}`;
             // Mark allowances to apply Transport Allowance logic later
@@ -900,126 +903,50 @@
             allowancesContainer.appendChild(wrapper);
         }
 
-        // function createCheckbox(name, amounts) {
-        //     const id = `allowance-${name.replace(/[\s/()]+/g, '-')}`;
-        //     const flags = {
-        //         noTransport: "data-no-transport",
-        //         isLeasedAccommodation: "data-is-leased-accommodation",
-        //         isEntertainment: "data-is-entertainment",
-        //         isMarketing: "data-is-marketing",
-        //         isOfficerTQ: "data-is-officer-tq"
-        //     };
-
-        //     const input = document.createElement('input');
-        //     input.type = 'checkbox';
-        //     input.id = id;
-        //     input.className = 'form-check-input'; // Bootstrap native
-        //     input.setAttribute('data-old-amount', amounts.old);
-        //     input.setAttribute('data-new-amount', amounts.new);
-
-        //     Object.entries(flags).forEach(([key, attr]) => {
-        //         if (amounts[key]) input.setAttribute(attr, "true");
-        //     });
-
-        //     const label = document.createElement('label');
-        //     label.htmlFor = id;
-        //     label.className = 'ms-2 small text-dark';
-        //     label.textContent = name;
-
-        //     const wrapper = document.createElement('div');
-        //     wrapper.className = 'd-flex align-items-center bg-light p-2 rounded border';
-        //     wrapper.append(input, label);
-
-        //     allowancesContainer.appendChild(wrapper);
-        // }
-
-
         // Populates the "Old Basic Pay" dropdown based on the selected cadre.
         function populateBasicDropdown() {
             const selectedCadre = cadreSelect.value;
             const cadreInfo = salaryData[selectedCadre];
-
-            // Clear existing options
             oldBasicSelect.innerHTML = '';
-
-            if (cadreInfo?.payMap) {
-                const fragment = document.createDocumentFragment();
-
-                cadreInfo.payMap.forEach(pay => {
-                    const option = document.createElement('option');
-                    option.value = pay.old;
-                    option.setAttribute('data-new-basic', pay.new);
-                    option.textContent = pay.old.toLocaleString('en-IN');
-
-                    fragment.appendChild(option);
+            if (cadreInfo) {
+                cadreInfo.payMap.forEach(p => {
+                    oldBasicSelect.innerHTML += `<option value="${p.old}" data-new-basic="${p.new}">${p.old.toLocaleString('en-IN')}</option>`;
                 });
-
-                oldBasicSelect.appendChild(fragment);
             }
-
             updateMainBasicDisplay();
         }
 
         // Populates the "Arrears Old Basic Pay" dropdown based on the selected arrears cadre.
         function populateArrearsBasicDropdown() {
-            const selectedCadre = arrearsCadreSelect.value;
-            const cadreInfo = salaryData[selectedCadre];
-
-            // Clear previous values
-            arrearsOldBasicSelect.innerHTML = '';
-            arrearsNewBasicDisplay.textContent = '';
-
-            // If no valid cadre, show a placeholder and exit
-            if (!cadreInfo?.payMap) {
+            const selectedArrearsCadre = arrearsCadreSelect.value;
+            if (!selectedArrearsCadre || !salaryData[selectedArrearsCadre]) {
                 arrearsOldBasicSelect.innerHTML = '<option value="">Select</option>';
+                arrearsNewBasicDisplay.textContent = '';
                 return;
             }
-
-            const fragment = document.createDocumentFragment();
-
-            cadreInfo.payMap.forEach(pay => {
-                const option = document.createElement('option');
-                option.value = pay.old;
-                option.setAttribute('data-new-basic', pay.new);
-                option.textContent = pay.old.toLocaleString('en-IN');
-                fragment.appendChild(option);
+            const cadreInfo = salaryData[selectedArrearsCadre];
+            arrearsOldBasicSelect.innerHTML = '';
+            cadreInfo.payMap.forEach(p => {
+                arrearsOldBasicSelect.innerHTML += `<option value="${p.old}" data-new-basic="${p.new}">${p.old.toLocaleString('en-IN')}</option>`;
             });
-
-            arrearsOldBasicSelect.appendChild(fragment);
-
             updateArrearsBasicDisplay();
         }
 
         // Populates the "Promoted Old Basic Pay" dropdown based on the selected promoted cadre.
         function populatePromotedBasicDropdown() {
-            const selectedCadre = promotedCadreSelect.value;
-            const cadreInfo = salaryData[selectedCadre];
-
-            // Clear previous values
-            promotedOldBasicSelect.innerHTML = '';
-            promotedNewBasicDisplay.textContent = '';
-
-            // If no valid cadre, show placeholder and exit
-            if (!cadreInfo?.payMap) {
+            const selectedPromotedCadre = promotedCadreSelect.value;
+            if (!selectedPromotedCadre) {
                 promotedOldBasicSelect.innerHTML = '<option value="">Select</option>';
+                promotedNewBasicDisplay.textContent = '';
                 return;
             }
-
-            const fragment = document.createDocumentFragment();
-
-            cadreInfo.payMap.forEach(pay => {
-                const option = document.createElement('option');
-                option.value = pay.old;
-                option.setAttribute('data-new-basic', pay.new);
-                option.textContent = pay.old.toLocaleString('en-IN');
-                fragment.appendChild(option);
+            const cadreInfo = salaryData[selectedPromotedCadre];
+            promotedOldBasicSelect.innerHTML = '';
+            cadreInfo.payMap.forEach(p => {
+                promotedOldBasicSelect.innerHTML += `<option value="${p.old}" data-new-basic="${p.new}">${p.old.toLocaleString('en-IN')}</option>`;
             });
-
-            promotedOldBasicSelect.appendChild(fragment);
-
             updatePromotedBasicDisplay();
         }
-
 
         // Updates the new basic pay display for the main calculator
         function updateMainBasicDisplay() {
@@ -1127,46 +1054,20 @@
 
         // Populates the month dropdowns.
         function populateMonthDropdowns() {
-            const months = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-            const dropdowns = [
-                nextIncrementMonthSelect,
-                inChargeFromMonthSelect,
-                inChargeUpToMonthSelect,
-                promotionMonthSelect
-            ];
-
-            const createMonthOptions = () => {
-                const fragment = document.createDocumentFragment();
-
-                // Default "Month" option
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.textContent = 'Month';
-                fragment.appendChild(defaultOption);
-
-                // Month options
+            function populate(selectElement) {
+                selectElement.innerHTML = '<option value="">Month</option>';
                 months.forEach((month, index) => {
-                    const option = document.createElement('option');
-                    option.value = index + 1; // 1-12
-                    option.textContent = month;
-                    fragment.appendChild(option);
+                    selectElement.innerHTML += `<option value="${index + 1}">${month}</option>`;
                 });
+            }
 
-                return fragment;
-            };
-
-            const optionsFragment = createMonthOptions();
-
-            dropdowns.forEach(select => {
-                select.innerHTML = '';                  // Clear existing
-                select.appendChild(optionsFragment.cloneNode(true)); // Use cloned fragment
-            });
+            populate(nextIncrementMonthSelect);
+            populate(inChargeFromMonthSelect);
+            populate(inChargeUpToMonthSelect);
+            populate(promotionMonthSelect);
         }
-
 
 
         // Finds the correct DA slabs for a given date.
@@ -1205,7 +1106,7 @@
         function renderRow(component, oldVal, newVal) {
             const increase = newVal - oldVal;
             const growth = oldVal > 0 ? (increase / oldVal) * 100 : (newVal > 0 ? 100 : 0);
-            return `<tr><td class="text-start">${component}</td><td class="text-end">${formatCurrency(oldVal)}</td><td class="text-end">${formatCurrency(newVal)}</td><td class="increase-cell text-end">${formatCurrency(increase)}</td><td class="increase-cell text-end">${growth.toFixed(2)}%</td></tr>`;
+            return `<tr><td class="text-start">${component}</td><td class="text-end">${f(oldVal)}</td><td class="text-end">${f(newVal)}</td><td class="text-end increase-cell">${f(increase)}</td><td class="increase-cell text-end">${growth.toFixed(2)}%</td></tr>`;
         }
 
         // Renders the entire salary comparison table and the arrears section.
@@ -1255,9 +1156,9 @@
             const grossIncrease = combinedNewGross - combinedOldGross;
             // FIX: Changed 'increase' to 'grossIncrease'
             const grossGrowth = combinedOldGross > 0 ? (grossIncrease / combinedOldGross) * 100 : 100;
-            oldGrossTotalDisplay.textContent = formatCurrency(combinedOldGross);
-            newGrossTotalDisplay.textContent = formatCurrency(combinedNewGross);
-            grossTotalIncreaseDisplay.textContent = formatCurrency(grossIncrease);
+            oldGrossTotalDisplay.textContent = f(combinedOldGross);
+            newGrossTotalDisplay.textContent = f(combinedNewGross);
+            grossTotalIncreaseDisplay.textContent = f(grossIncrease);
             grossTotalGrowthDisplay.textContent = grossGrowth.toFixed(2) + '%';
         }
 
@@ -1305,10 +1206,10 @@
                 }
 
                 totalLeArrears += instanceArrear;
-                instance.arrearDisplay.textContent = formatCurrency(instanceArrear);
+                instance.arrearDisplay.textContent = f(instanceArrear);
             });
 
-            totalLeArrearsDisplay.textContent = `₹${formatCurrency(totalLeArrears)}`; // Added ₹ symbol
+            totalLeArrearsDisplay.textContent = `₹${f(totalLeArrears)}`; // Added ₹ symbol
             return totalLeArrears;
         }
 
@@ -1353,15 +1254,15 @@
             data.forEach(item => {
                 rows += `<tr>
                     <td class="text-start">${item.month}</td>
-                    <td class="text-end">${formatCurrency(item.totalOld)}</td>
-                    <td class="text-end">${formatCurrency(item.totalNew)}</td>
-                    <td class="increase-cell text-end">${formatCurrency(item.totalNew - item.totalOld)}</td>
-                    <td class="text-end">${formatCurrency(item.oldDeduction)}</td>
-                    <td class="text-end">${formatCurrency(item.newDeduction)}</td>
-                    <td class="text-end">${formatCurrency(item.newDeduction - item.oldDeduction)}</td>
-                    <td class="text-end">${formatCurrency(item.netOld)}</td>
-                    <td class="text-end">${formatCurrency(item.netNew)}</td>
-                    <td class="increase-cell text-end">${formatCurrency(item.monthlyIncrease)}</td>
+                    <td class="text-end">${f(item.totalOld)}</td>
+                    <td class="text-end">${f(item.totalNew)}</td>
+                    <td class="increase-cell text-end">${f(item.totalNew - item.totalOld)}</td>
+                    <td class="text-end">${f(item.oldDeduction)}</td>
+                    <td class="text-end">${f(item.newDeduction)}</td>
+                    <td class="text-end">${f(item.newDeduction - item.oldDeduction)}</td>
+                    <td class="text-end">${f(item.netOld)}</td>
+                    <td class="text-end">${f(item.netNew)}</td>
+                    <td class="increase-cell text-end">${f(item.monthlyIncrease)}</td>
                 </tr>`;
                 totalOldGross += item.totalOld;
                 totalNewGross += item.totalNew;
@@ -1387,23 +1288,23 @@
             monthlyNetDiffTotal.textContent = totalNetDiff; // This is the total monthly pre-tax arrears
 
             // Final Arrears Display (POST-TAX)
-            totalArrearsDisplay.textContent = `₹${formatCurrency(totalPostTaxArrears)}`; // Added ₹ symbol
+            totalArrearsDisplay.textContent = `₹${f(totalPostTaxArrears)}`; // Added ₹ symbol
 
             // Update NPS Summary fields
             if (contributionTypeSelect.value === 'NPS') {
                 npsAdjustmentSummary.classList.remove('hidden');
-                npsEmployeeDedArrear.textContent = formatFloat(totalNpsEmployeeDedArrear);
-                npsEmployerContArrear.textContent = formatFloat(totalNpsEmployerContArrear);
-                npsTotalRetainedArrear.textContent = formatFloat(totalNpsRetainedArrear);
+                npsEmployeeDedArrear.textContent = f_float(totalNpsEmployeeDedArrear);
+                npsEmployerContArrear.textContent = f_float(totalNpsEmployerContArrear);
+                npsTotalRetainedArrear.textContent = f_float(totalNpsRetainedArrear);
             } else {
                 npsAdjustmentSummary.classList.add('hidden');
             }
 
             // Update Tax Summary fields 
-            preTaxArrearsDisplay.textContent = formatFloat(totalMonthlyPreTaxArrears);
-            leArrearsSummaryDisplay.textContent = formatFloat(totalLeArrears);
-            combinedPreTaxArrearsDisplay.textContent = formatFloat(totalCombinedPreTaxArrears);
-            taxDeductedDisplay.textContent = formatFloat(finalTaxDeducted);
+            preTaxArrearsDisplay.textContent = f_float(totalMonthlyPreTaxArrears);
+            leArrearsSummaryDisplay.textContent = f_float(totalLeArrears);
+            combinedPreTaxArrearsDisplay.textContent = f_float(totalCombinedPreTaxArrears);
+            taxDeductedDisplay.textContent = f_float(finalTaxDeducted);
             taxRateDisplay.textContent = `${(taxRate * 100).toFixed(0)}%`;
         }
 
