@@ -56,7 +56,7 @@
                 <h2 class="accordion-header" id="headingInputs">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseInputs" aria-expanded="false" aria-controls="collapseInputs">
-                        1. Inputs & Pay Details
+                        1. Current salary comparison
                     </button>
                 </h2>
 
@@ -69,7 +69,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapseInputs-pay" aria-expanded="false"
                                         aria-controls="collapseInputs-pay">
-                                        1. Cadre and basic pay
+                                        A. Cadre and basic pay
                                     </button>
                                 </h2>
                                 <div id="collapseInputs-pay" class="accordion-collapse collapse show"
@@ -96,8 +96,9 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <label for="newBasicDisplay">
-
-                                                    Corresponding **New Basic (₹)**:
+                                                    <div class="fw-bold">
+                                                        Corresponding New Basic (₹)
+                                                    </div>
                                                 </label>
                                                 <div id="newBasicDisplay" class="new-basic-display w-full p-2.5">
                                                 </div>
@@ -132,10 +133,10 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapseInputs-allowance" aria-expanded="false"
                                         aria-controls="collapseInputs-allowance">
-                                        2. Select applicable allowances
+                                        B. Select applicable allowances
                                     </button>
                                 </h2>
-                                <div id="collapseInputs-allowance" class="accordion-collapse collapse show"
+                                <div id="collapseInputs-allowance" class="accordion-collapse collapse"
                                     aria-labelledby="headingInputs-allowance">
                                     <div class="accordion-body">
                                         <div class="input-card mb-8">
@@ -152,10 +153,10 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapseInputs-compare" aria-expanded="false"
                                         aria-controls="collapseInputs-compare">
-                                        3. Current Monthly Salary Comparison
+                                        C. Current Monthly Salary Comparison
                                     </button>
                                 </h2>
-                                <div id="collapseInputs-compare" class="accordion-collapse collapse show"
+                                <div id="collapseInputs-compare" class="accordion-collapse collapse"
                                     aria-labelledby="headingInputs-compare">
                                     <div class="accordion-body">
                                         <div class="table-responsive section-card p-2">
@@ -187,12 +188,26 @@
                                 </div>
                             </div>
 
-                            <div class="accordion-item section-card mb-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item section-card mb-3">
+                <h2 class="accordion-header" id="headingInputs-rev">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseInputs-rev" aria-expanded="false" aria-controls="collapseInputs-rev">
+                        2. Wage revision calculation
+                    </button>
+                </h2>
+                <div id="collapseInputs-rev" class="accordion-collapse collapse" aria-labelledby="headingInputs-rev">
+                    <div class="accordion-body">
+                        <div class="accordion-item section-card mb-3">
+                            <div class="accordion" id="subAccordion-2" data-bs-parent="">
                                 <h2 class="accordion-header" id="headingInputs-arrear">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapseInputs-arrear" aria-expanded="false"
                                         aria-controls="collapseInputs-arrear">
-                                        4. Arrears Calculation (from 01/08/2022)
+                                        A. Arrears Calculation (from 01/08/2022)
                                     </button>
                                 </h2>
                                 <div id="collapseInputs-arrear" class="accordion-collapse collapse show"
@@ -202,7 +217,8 @@
 
                                             <p class="text-dark small mb-4">
                                                 The arrears period covers <span id="arrears-months"
-                                                    class="fw-bold text-success"></span> months,
+                                                    class="fw-bold text-success"></span>
+                                                months,
                                                 from 01/08/2022 up to the current month.
                                             </p>
 
@@ -231,7 +247,9 @@
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label for="arrearsNewBasicDisplay"
-                                                        class="form-label small fw-medium">New Basic (01/08/2022)
+                                                        class="form-label small fw-medium">New
+                                                        Basic
+                                                        (01/08/2022)
                                                         (₹):</label>
                                                     <div id="arrearsNewBasicDisplay" class="p-2 border rounded"></div>
                                                 </div>
@@ -265,18 +283,22 @@
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label for="promotedCadre"
-                                                        class="form-label small fw-medium">Promoted Cadre:</label>
+                                                        class="form-label small fw-medium">Promoted
+                                                        Cadre:</label>
                                                     <select id="promotedCadre" class="form-select"></select>
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label for="promotedOldBasic"
-                                                        class="form-label small fw-medium">Promoted Basic Pay
+                                                        class="form-label small fw-medium">Promoted
+                                                        Basic Pay
                                                         (₹):</label>
                                                     <select id="promotedOldBasic" class="form-select"></select>
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label for="promotedNewBasicDisplay"
-                                                        class="form-label small fw-medium">New Basic (Promoted)
+                                                        class="form-label small fw-medium">New
+                                                        Basic
+                                                        (Promoted)
                                                         (₹):</label>
                                                     <div id="promotedNewBasicDisplay" class="p-2 border rounded"></div>
                                                 </div>
@@ -308,7 +330,9 @@
                                             <div class="row g-3 mt-3">
                                                 <div class="col-12 col-md-4">
                                                     <label for="annualTaxRate"
-                                                        class="form-label small fw-medium">Estimated Annual Income Tax
+                                                        class="form-label small fw-medium">Estimated
+                                                        Annual
+                                                        Income Tax
                                                         Rate on Arrears:</label>
                                                     <select id="annualTaxRate" class="form-select">
                                                         <option value="0.00">0% (No Deduction)</option>
@@ -325,108 +349,104 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-                            <div class="accordion-item section-card mb-3">
-                                <h2 class="accordion-header" id="headingInputs-leave">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseInputs-leave" aria-expanded="false"
-                                        aria-controls="collapseInputs-leave">
-                                        5. Leave Encashment Arrears (Max 3 Instances, 15 Days Max per Instance)
-                                    </button>
-                                </h2>
-                                <div id="collapseInputs-leave" class="accordion-collapse collapse show"
-                                    aria-labelledby="headingInputs-leave">
-                                    <div class="accordion-body">
-                                        <!-- Leave Encashment Arrears Section -->
-                                        <div class="mt-4 border-top pt-3">
+                        </div>
+                        <div class="accordion-item section-card mb-3">
+                            <h2 class="accordion-header" id="headingInputs-leave">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseInputs-leave" aria-expanded="false"
+                                    aria-controls="collapseInputs-leave">
+                                    B. Leave Encashment Arrears (Max 3 Instances, 15 Days Max per Instance)
+                                </button>
+                            </h2>
+                            <div id="collapseInputs-leave" class="accordion-collapse collapse"
+                                aria-labelledby="headingInputs-leave">
+                                <div class="accordion-body">
+                                    <!-- Leave Encashment Arrears Section -->
+                                    <div class="mt-4 border-top pt-3">
 
-                                            <div id="le-instances-container" class="mb-3">
-                                                <!-- Instance 1 -->
-                                                <div class="row g-2 align-items-end le-instance mb-3" data-instance="1">
-                                                    <div class="col-12 border-bottom pb-1 text-dark fw-medium">
-                                                        Instance 1:
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <label for="le-start-1" class="form-label small text-muted">Date
-                                                            From:</label>
-                                                        <input type="date" id="le-start-1"
-                                                            class="form-control form-control-sm" min="2022-08-01">
-                                                    </div>
-                                                    <div class="col-6 col-md-3">
-                                                        <label for="le-days-1" class="form-label small text-muted">Days
-                                                            Encashment (Max 15):</label>
-                                                        <input type="number" id="le-days-1"
-                                                            class="form-control form-control-sm" min="0" max="15"
-                                                            value="0">
-                                                    </div>
-                                                    <div class="col-6 col-md-3 text-end">
-                                                        <span class="small fw-semibold text-dark">Arrear (₹): <span
-                                                                id="le-arrear-1">0</span></span>
-                                                    </div>
+                                        <div id="le-instances-container" class="mb-3">
+                                            <!-- Instance 1 -->
+                                            <div class="row g-2 align-items-end le-instance mb-3" data-instance="1">
+                                                <div class="col-12 border-bottom pb-1 text-dark fw-medium">
+                                                    Instance 1:
                                                 </div>
-
-                                                <!-- Instance 2 -->
-                                                <div class="row g-2 align-items-end le-instance mb-3" data-instance="2">
-                                                    <div class="col-12 border-bottom pb-1 text-dark fw-medium">
-                                                        Instance 2:
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <label for="le-start-2" class="form-label small text-muted">Date
-                                                            From:</label>
-                                                        <input type="date" id="le-start-2"
-                                                            class="form-control form-control-sm" min="2022-08-01">
-                                                    </div>
-                                                    <div class="col-6 col-md-3">
-                                                        <label for="le-days-2" class="form-label small text-muted">Days
-                                                            Encashment (Max 15):</label>
-                                                        <input type="number" id="le-days-2"
-                                                            class="form-control form-control-sm" min="0" max="15"
-                                                            value="0">
-                                                    </div>
-                                                    <div class="col-6 col-md-3 text-end">
-                                                        <span class="small fw-semibold text-dark">Arrear (₹): <span
-                                                                id="le-arrear-2">0</span></span>
-                                                    </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label for="le-start-1" class="form-label small text-muted">Date
+                                                        From:</label>
+                                                    <input type="date" id="le-start-1"
+                                                        class="form-control form-control-sm" min="2022-08-01">
                                                 </div>
-
-                                                <!-- Instance 3 -->
-                                                <div class="row g-2 align-items-end le-instance mb-3" data-instance="3">
-                                                    <div class="col-12 border-bottom pb-1 text-dark fw-medium">
-                                                        Instance 3:
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <label for="le-start-3" class="form-label small text-muted">Date
-                                                            From:</label>
-                                                        <input type="date" id="le-start-3"
-                                                            class="form-control form-control-sm" min="2022-08-01">
-                                                    </div>
-                                                    <div class="col-6 col-md-3">
-                                                        <label for="le-days-3" class="form-label small text-muted">Days
-                                                            Encashment (Max 15):</label>
-                                                        <input type="number" id="le-days-3"
-                                                            class="form-control form-control-sm" min="0" max="15"
-                                                            value="0">
-                                                    </div>
-                                                    <div class="col-6 col-md-3 text-end">
-                                                        <span class="small fw-semibold text-dark">Arrear (₹): <span
-                                                                id="le-arrear-3">0</span></span>
-                                                    </div>
+                                                <div class="col-6 col-md-3">
+                                                    <label for="le-days-1" class="form-label small text-muted">Days
+                                                        Encashment (Max 15):</label>
+                                                    <input type="number" id="le-days-1"
+                                                        class="form-control form-control-sm" min="0" max="15" value="0">
+                                                </div>
+                                                <div class="col-6 col-md-3 text-end">
+                                                    <span class="small fw-semibold text-dark">Arrear (₹): <span
+                                                            id="le-arrear-1">0</span></span>
                                                 </div>
                                             </div>
 
-                                            <div
-                                                class="d-flex justify-content-between align-items-center bg-warning-subtle border border-warning rounded p-2">
-                                                <span class="fw-bold small text-dark">Total Leave Encashment
-                                                    Arrears:</span>
-                                                <span id="total-le-arrears" class="fw-bold text-primary">₹0</span>
+                                            <!-- Instance 2 -->
+                                            <div class="row g-2 align-items-end le-instance mb-3" data-instance="2">
+                                                <div class="col-12 border-bottom pb-1 text-dark fw-medium">
+                                                    Instance 2:
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label for="le-start-2" class="form-label small text-muted">Date
+                                                        From:</label>
+                                                    <input type="date" id="le-start-2"
+                                                        class="form-control form-control-sm" min="2022-08-01">
+                                                </div>
+                                                <div class="col-6 col-md-3">
+                                                    <label for="le-days-2" class="form-label small text-muted">Days
+                                                        Encashment (Max 15):</label>
+                                                    <input type="number" id="le-days-2"
+                                                        class="form-control form-control-sm" min="0" max="15" value="0">
+                                                </div>
+                                                <div class="col-6 col-md-3 text-end">
+                                                    <span class="small fw-semibold text-dark">Arrear (₹): <span
+                                                            id="le-arrear-2">0</span></span>
+                                                </div>
                                             </div>
 
+                                            <!-- Instance 3 -->
+                                            <div class="row g-2 align-items-end le-instance mb-3" data-instance="3">
+                                                <div class="col-12 border-bottom pb-1 text-dark fw-medium">
+                                                    Instance 3:
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label for="le-start-3" class="form-label small text-muted">Date
+                                                        From:</label>
+                                                    <input type="date" id="le-start-3"
+                                                        class="form-control form-control-sm" min="2022-08-01">
+                                                </div>
+                                                <div class="col-6 col-md-3">
+                                                    <label for="le-days-3" class="form-label small text-muted">Days
+                                                        Encashment (Max 15):</label>
+                                                    <input type="number" id="le-days-3"
+                                                        class="form-control form-control-sm" min="0" max="15" value="0">
+                                                </div>
+                                                <div class="col-6 col-md-3 text-end">
+                                                    <span class="small fw-semibold text-dark">Arrear (₹): <span
+                                                            id="le-arrear-3">0</span></span>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        <div
+                                            class="d-flex justify-content-between align-items-center bg-warning-subtle border border-warning rounded p-2">
+                                            <span class="fw-bold small text-dark">Total Leave Encashment
+                                                Arrears:</span>
+                                            <span id="total-le-arrears" class="fw-bold text-primary">₹0</span>
+                                        </div>
+
                                     </div>
                                 </div>
-
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -437,13 +457,13 @@
                 <h2 class="accordion-header" id="headingExport">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseExport" aria-expanded="false" aria-controls="collapseExport">
-                        2. Export / Help
+                        3. Export to CSV
                     </button>
                 </h2>
                 <div id="collapseExport" class="accordion-collapse collapse" aria-labelledby="headingExport">
                     <div class="accordion-body">
                         <!-- Total Arrears & Export -->
-                        <div class="mt-3 border-top pt-3">
+                        <div class="mt-3 pt-3">
                             <p class="small text-muted mb-2">
                                 These figures are provided for estimation purposes only. The final arrear amount
                                 is subject to change pending a comprehensive and definitive calculation.
@@ -456,7 +476,7 @@
                                 <span id="total-arrears" class="text-success fs-2 fw-bold">₹</span>
                             </div>
 
-                            <button id="exportBtn" class="btn btn-primary">
+                            <button id="exportBtn" class="btn btn-success">
                                 Export Detailed Arrears Breakdown to CSV
                             </button>
                         </div>
@@ -553,7 +573,8 @@
                                             <tr>
                                                 <td>Tax Deducted (<span id="tax-rate-display"></span>)</td>
                                                 <td class="text-end font-monospace text-danger"
-                                                    id="tax-deducted-display"></td>
+                                                    id="tax-deducted-display">
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -566,13 +587,9 @@
             </div>
 
             <footer class="mt-4 small-muted text-center">
-                Disclaimer: The figures presented are based on a tentative proposal and are subject to
-                modification upon
-                the
-                finalization of the revised offer from GIPSA. Any minor errors or discrepancies should
-                be
-                disregarded
-                pending the release of the official notification.
+                Disclaimer: The figures presented are based on a tentative proposal and are subject to modification upon
+                the finalization of the revised offer from GIPSA. Any minor errors or discrepancies should
+                be disregarded pending the release of the official notification.
             </footer>
         </div>
     </div>
@@ -587,7 +604,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body small-muted">
-                    <p>GIPA wage revision calculator 2025
+                    <p>GIPSA wage revision calculator 2025</p>
+                    <p> Inspired by <a href="https://arrearscalculator-by-ashutoshsolankey.netlify.app/">wage
+                            revision
+                            calculator</a> made by Shri Ashutosh Solankey (SBM, Roshanara Road Branch), N.I.C.L.
                     </p>
                 </div>
                 <div class="modal-footer">
