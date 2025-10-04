@@ -1,621 +1,676 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GIPSA Salary Comparison & Arrears Calculator (Old vs. New)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GIPSA Arrears Calculator</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
+        /* minor polish */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
-        }
-        .calculator-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 2.5rem;
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
-            border: 1px solid #e5e7eb;
-        }
-        /* Enhanced Input Styling */
-        .input-card {
-            background-color: #f9fafb; /* Reverted to light grey background */
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Softer shadow */
-            border: 1px solid #e5e7eb;
-        }
-        .form-select, .form-input {
-            border-radius: 8px;
-            border: 1px solid #a8a8a8; /* Darker border for contrast */
-            transition: all 0.2s ease-in-out;
-            background-color: #f9fafb; /* Light gray input background */
-        }
-        .form-select:focus, .form-input:focus {
-            --tw-ring-color: #007a80;
-            border-color: #007a80;
-            box-shadow: 0 0 0 4px rgba(0, 122, 128, 0.35); /* More prominent focus ring */
-            background-color: white;
-        }
-        /* Table Styling */
-        .comparison-table th, .comparison-table td {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid #d1d5db;
-            text-align: right;
-        }
-        .comparison-table th:first-child, .comparison-table td:first-child {
-            text-align: left;
-            font-weight: 600;
-            color: #1f2937;
-        }
-        .comparison-table th {
-            background-color: #e0f2fe; /* Light Blue Header */
-            font-weight: 700;
-            color: #0c4a6e;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
-        }
-        .comparison-table tbody tr:nth-child(even) {
-            background-color: #f9fafb;
-        }
-        .total-row td {
-            font-weight: 700;
-            background-color: #004d66; /* Darker Blue Total Row */
-            font-size: 1.2rem;
-            color: #ffffff;
-        }
-        .increase-cell {
-            color: #34d399; /* Bright Green */
-            font-weight: 700;
-        }
-        
-        /* Header Styling with Gradient */
-        .header {
-            background-color: #003366;
-            background-image: linear-gradient(135deg, #003366 0%, #007a80 100%);
-            color: white;
-            padding: 2.5rem 2rem;
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
-            margin: -2.5rem -2.5rem 2.5rem -2.5rem;
-            position: relative;
-            overflow: hidden;
-            border-bottom: 6px solid #34d399; /* Green Accent */
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuMCIgcGF0dGVybldpZHRoPSI0MCIgcGF0dGVybkhlaWdodD0iNDAiIHg9IjAiIHk9IjAiPjxyZWN0IHdpZHRoPSIyIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz48L2NsaXBBdGg+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybjApIiBvcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
-            background-size: 40px 40px;
-            opacity: 0.5;
-            z-index: 1;
-        }
-        .header > * {
-            position: relative;
-            z-index: 2;
-        }
-        .new-basic-display {
-            background-color: #dbeafe; /* Light blue result background */
-            border-radius: 8px;
-            padding: 0.75rem;
-            font-weight: 700;
-            color: #1e3a8a;
-            border: 1px solid #93c5fd;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .developer-credit-text {
-            background-image: linear-gradient(to right, #003366, #007a80);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800; /* Extra bold for prominence */
-            letter-spacing: 0.025em;
-        }
-        .arrears-container {
-            background-color: #e9fff4; /* Very light green for the section */
-            border: 1px solid #99f6e4;
-        }
-        .le-instance input[type="date"], .le-instance input[type="number"] {
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            height: 2.5rem;
-        }
-        /* Icon styling (using SVG colors) */
-        .text-icon {
-            color: #007a80;
+            background: #f8f9fa;
         }
 
-        /* NEW LAYOUT FOR ALLOWANCES - 3 per row on desktop */
-        .allowance-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Adjusted min-width for 3-up */
-            gap: 0.75rem;
+        .section-card {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
-        @media (min-width: 1024px) {
-            .allowance-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+
+        .small-muted {
+            font-size: .9rem;
+            color: #6c757d;
         }
-        /* Style for individual allowance item */
-        .allowance-grid > div {
-            padding: 0.5rem;
+
+        .input-group-sm .form-control {
+            height: calc(1.5em + .5rem + 2px);
+        }
+
+        .table-responsive {
+            max-height: 520px;
+            overflow: auto;
         }
     </style>
 </head>
-<body class="bg-gray-100">
 
-    <div class="calculator-container">
-        <div class="header text-center">
-            <p class="text-xl font-bold">General Insurance Employees' All India Association</p>
-            <h1 class="text-3xl font-bold">Old vs. New Salary Calculator for GIPSA Employees</h1>
-            <p class="text-base opacity-90">Based on the **14% Wage Revision Offer** (Effective 01-08-2022).</p>
-        </div>
-
-        <div class="input-card grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-                <label for="cadre" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-                    Current Cadre:
-                </label>
-                <select id="cadre" class="form-select w-full p-2.5 bg-white"></select>
-            </div>
-            <div>
-                <label for="oldBasic" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                    Old Basic Pay Slab (₹):
-                </label>
-                <select id="oldBasic" class="form-select w-full p-2.5 bg-white"></select>
-            </div>
-            <div>
-                <label for="newBasicDisplay" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                    Corresponding **New Basic (₹)**:
-                </label>
-                <div id="newBasicDisplay" class="new-basic-display w-full p-2.5"></div>
-            </div>
-        </div>
-        <div class="input-card mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label for="city" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    Select City Class (HRA/CCA):
-                </label>
-                <select id="city" class="form-select w-full p-2.5 bg-white">
-                    <option value="A">Class A</option>
-                    <option value="B">Class B</option>
-                    <option value="C">Class C</option>
-                </select>
-            </div>
-            <div>
-                <label for="fpaCadre" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3c1.92 0 3.84 1.15 4.5 2.5a5.5 5.5 0 0 1 4.5-2.5C19 3 22 5.28 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
-                    FPA Applicable Cadre/Scale (If applicable):
-                </label>
-                <select id="fpaCadre" class="form-select w-full p-2.5 bg-white">
-                    <option value="">Select</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="input-card mb-8">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2 section-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                Select Applicable Allowances
-            </h3>
-            <!-- Allowance grid now uses custom CSS to fit 3 per row on desktop -->
-            <div id="allowances-container" class="allowance-grid"></div>
-        </div>
-
-        <div id="results" class="mt-6">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2 section-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                Current Monthly Salary Comparison
-            </h2>
-            <div class="overflow-x-auto rounded-lg border shadow-lg">
-                <table class="w-full text-sm text-gray-700 comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Component</th>
-                            <th>Old Salary (₹)</th>
-                            <th>New Salary (₹)</th>
-                            <th>Increase (₹)</th>
-                            <th>Growth (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="comparison-body"></tbody>
-                    <tfoot id="comparison-foot" class="total-row text-base">
-                        <tr>
-                            <td>Gross Monthly Salary</td>
-                            <td id="old-gross-total"></td>
-                            <td id="new-gross-total"></td>
-                            <td class="increase-cell" id="gross-total-increase"></td>
-                            <td class="increase-cell" id="gross-total-growth"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-        
-        <hr class="my-8 border-gray-300">
-
-        <div class="arrears-container p-6 bg-green-50 rounded-lg border border-green-200 shadow-xl">
-            <h2 class="text-xl font-semibold text-green-700 mb-3 section-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-500"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                Arrears Calculation (from 01/08/2022)
-            </h2 >
-            <p class="text-gray-800 text-sm mb-4">
-                The arrears period covers <span id="arrears-months" class="font-bold text-green-700"></span> months, from 01/08/2022 up to the current month.
-            </p>
-            <div class="input-card grid grid-cols-1 md:grid-cols-3 gap-6">
-                
+<body>
+    <div class="container-fluid py-4">
+        <header class="mb-4">
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <label for="contributionType" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Contribution Type (Affects Arrear Deductions/Adjustments):
-                    </label>
-                    <select id="contributionType" class="form-select w-full p-2.5 bg-white">
-                        <option value="PF">PF Subscriber (Employee: 10% of Basic Pay)</option>
-                        <option value="NPS">NPS Subscriber (Employee: 10%, Employer: Old 10% / New 14% of Basic + DA)</option>
-                    </select>
+                    <h3 class="mb-0">GIPSA Salary / Arrears Calculator</h3>
+                    <div class="small-muted">By General Insurance Employees' All India Association</div>
                 </div>
                 <div>
-                    <label for="arrearsCadre" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        Cadre on **01/08/2022**:
-                    </label>
-                    <select id="arrearsCadre" class="form-select w-full p-2.5 bg-white"></select>
-                </div>
-                <div>
-                    <label for="arrearsOldBasic" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Old Basic Pay on 01/08/2022 (₹):
-                    </label>
-                    <select id="arrearsOldBasic" class="form-select w-full p-2.5 bg-white"></select>
-                </div>
-                <div>
-                    <label for="arrearsNewBasicDisplay" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                        New Basic (01/08/2022) (₹):
-                    </label>
-                    <div id="arrearsNewBasicDisplay" class="new-basic-display w-full p-2.5"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="col-span-2">
-                        <label for="nextIncrementMonth" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            Next Annual Increment Due (If before Promotion):
-                        </label>
-                    </div>
-                    <div>
-                        <select id="nextIncrementMonth" class="form-select w-full p-2.5 bg-white">
-                            <option value="">Month</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="nextIncrementYear" class="form-select w-full p-2.5 bg-white">
-                            <option value="">Year</option>
-                        </select>
-                    </div>
+                    <button class="btn btn-secondary me-2" data-bs-toggle="modal"
+                        data-bs-target="#aboutModal">About</button>
+
                 </div>
             </div>
-            <div class="input-card mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="col-span-1">
-                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        Promotion Date (If occurred after 01/08/2022):
-                    </label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="promotionMonth" class="form-select w-full p-2.5 bg-white">
-                            <option value="">Month</option>
-                        </select>
-                        <select id="promotionYear" class="form-select w-full p-2.5 bg-white">
-                            <option value="">Year</option>
-                        </select>
+        </header>
+        <div class="accordion" id="mainAccordion" data-bs-parent="">
+            <!-- Panel 1: Inputs -->
+            <div class="accordion-item section-card mb-3">
+                <h2 class="accordion-header" id="headingInputs">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseInputs" aria-expanded="false" aria-controls="collapseInputs">
+                        1. Inputs & Pay Details
+                    </button>
+                </h2>
+
+                <div id="collapseInputs" class="accordion-collapse collapse show" aria-labelledby="headingInputs">
+                    <div class="accordion-body">
+                        <div class="accordion" id="subAccordion" data-bs-parent="">
+                            <!-- Panel 1: Inputs -->
+                            <div class="accordion-item section-card mb-3">
+                                <h2 class="accordion-header" id="headingInputs-pay">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseInputs-pay" aria-expanded="false"
+                                        aria-controls="collapseInputs-pay">
+                                        1. Cadre and basic pay
+                                    </button>
+                                </h2>
+                                <div id="collapseInputs-pay" class="accordion-collapse collapse show"
+                                    aria-labelledby="headingInputs-pay">
+                                    <div class="accordion-body">
+                                        <form id="calcForm" class="row g-3 align-items-end">
+                                            <div class="col-md-2">
+
+                                                <label for="cadre"
+                                                    class="flex items-center text-sm font-medium text-gray-700 mb-2">
+
+                                                    Current Cadre:
+                                                </label>
+                                                <select id="cadre" class="form-select w-full p-2.5 bg-white"></select>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label for="oldBasic"
+                                                    class="flex items-center text-sm font-medium text-gray-700 mb-2">
+
+                                                    Old Basic Pay Slab (₹):
+                                                </label>
+                                                <select id="oldBasic"
+                                                    class="form-select w-full p-2.5 bg-white"></select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="newBasicDisplay">
+
+                                                    Corresponding **New Basic (₹)**:
+                                                </label>
+                                                <div id="newBasicDisplay" class="new-basic-display w-full p-2.5">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label for="city">
+
+                                                    Select City Class (HRA/CCA):
+                                                </label>
+                                                <select id="city" class="form-select w-full p-2.5 bg-white">
+                                                    <option value="A">Class A</option>
+                                                    <option value="B">Class B</option>
+                                                    <option value="C">Class C</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label for="fpaCadre">
+
+                                                    FPA Applicable Cadre/Scale (If applicable):
+                                                </label>
+                                                <select id="fpaCadre" class="form-select w-full p-2.5 bg-white">
+                                                    <option value="">Select</option>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Panel 1: Inputs -->
+                            <div class="accordion-item section-card mb-3">
+                                <h2 class="accordion-header" id="headingInputs-allowance">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseInputs-allowance" aria-expanded="false"
+                                        aria-controls="collapseInputs-allowance">
+                                        2. Select applicable allowances
+                                    </button>
+                                </h2>
+                                <div id="collapseInputs-allowance" class="accordion-collapse collapse show"
+                                    aria-labelledby="headingInputs-allowance">
+                                    <div class="accordion-body">
+                                        <div class="input-card mb-8">
+
+                                            <!-- Allowance grid now uses custom CSS to fit 3 per row on desktop -->
+                                            <div id="allowances-container" class="row row-cols-1 row-cols-md-3 g-3">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item section-card mb-3">
+                                <h2 class="accordion-header" id="headingInputs-compare">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseInputs-compare" aria-expanded="false"
+                                        aria-controls="collapseInputs-compare">
+                                        3. Current Monthly Salary Comparison
+                                    </button>
+                                </h2>
+                                <div id="collapseInputs-compare" class="accordion-collapse collapse show"
+                                    aria-labelledby="headingInputs-compare">
+                                    <div class="accordion-body">
+                                        <div class="table-responsive section-card p-2">
+                                            <table id="arrearsTable"
+                                                class="table table-striped table-bordered table-hover table-sm mb-0">
+                                                <thead class="table-light">
+                                                    <tr class="text-center">
+                                                        <th>Component</th>
+                                                        <th>Old Salary (₹)</th>
+                                                        <th>New Salary (₹)</th>
+                                                        <th>Increase (₹)</th>
+                                                        <th>Growth (%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="comparison-body"></tbody>
+                                                <tfoot id="comparison-foot" class="total-row text-base">
+                                                    <tr>
+                                                        <td>Gross Monthly Salary</td>
+                                                        <td id="old-gross-total"></td>
+                                                        <td id="new-gross-total"></td>
+                                                        <td class="increase-cell" id="gross-total-increase"></td>
+                                                        <td class="increase-cell" id="gross-total-growth"></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item section-card mb-3">
+                                <h2 class="accordion-header" id="headingInputs-arrear">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseInputs-arrear" aria-expanded="false"
+                                        aria-controls="collapseInputs-arrear">
+                                        4. Arrears Calculation (from 01/08/2022)
+                                    </button>
+                                </h2>
+                                <div id="collapseInputs-arrear" class="accordion-collapse collapse show"
+                                    aria-labelledby="headingInputs-arrear">
+                                    <div class="accordion-body">
+                                        <div class="p-4 bg-success-subtle border border-success rounded shadow-sm">
+
+                                            <p class="text-dark small mb-4">
+                                                The arrears period covers <span id="arrears-months"
+                                                    class="fw-bold text-success"></span> months,
+                                                from 01/08/2022 up to the current month.
+                                            </p>
+
+                                            <!-- First Input Grid -->
+                                            <div class="row g-3">
+                                                <div class="col-12 col-md-4">
+                                                    <label for="contributionType" class="form-label small fw-medium">
+                                                        Contribution Type (Affects Arrear Deductions/Adjustments):
+                                                    </label>
+                                                    <select id="contributionType" class="form-select">
+                                                        <option value="PF">PF Subscriber (Employee: 10% of Basic Pay)
+                                                        </option>
+                                                        <option value="NPS">NPS Subscriber (Employee: 10%, Employer: Old
+                                                            10% / New 14% of Basic + DA)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label for="arrearsCadre" class="form-label small fw-medium">Cadre
+                                                        on 01/08/2022:</label>
+                                                    <select id="arrearsCadre" class="form-select"></select>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label for="arrearsOldBasic" class="form-label small fw-medium">Old
+                                                        Basic Pay on 01/08/2022 (₹):</label>
+                                                    <select id="arrearsOldBasic" class="form-select"></select>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label for="arrearsNewBasicDisplay"
+                                                        class="form-label small fw-medium">New Basic (01/08/2022)
+                                                        (₹):</label>
+                                                    <div id="arrearsNewBasicDisplay" class="p-2 border rounded"></div>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-medium">Next Annual Increment Due
+                                                        (If before Promotion):</label>
+                                                    <div class="d-flex gap-2">
+                                                        <select id="nextIncrementMonth" class="form-select flex-fill">
+                                                            <option value="">Month</option>
+                                                        </select>
+                                                        <select id="nextIncrementYear" class="form-select flex-fill">
+                                                            <option value="">Year</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Promotion and Allowances Grid -->
+                                            <div class="row g-3 mt-3">
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-medium">Promotion Date (If
+                                                        occurred after 01/08/2022):</label>
+                                                    <div class="d-flex gap-2">
+                                                        <select id="promotionMonth" class="form-select flex-fill">
+                                                            <option value="">Month</option>
+                                                        </select>
+                                                        <select id="promotionYear" class="form-select flex-fill">
+                                                            <option value="">Year</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label for="promotedCadre"
+                                                        class="form-label small fw-medium">Promoted Cadre:</label>
+                                                    <select id="promotedCadre" class="form-select"></select>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label for="promotedOldBasic"
+                                                        class="form-label small fw-medium">Promoted Basic Pay
+                                                        (₹):</label>
+                                                    <select id="promotedOldBasic" class="form-select"></select>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label for="promotedNewBasicDisplay"
+                                                        class="form-label small fw-medium">New Basic (Promoted)
+                                                        (₹):</label>
+                                                    <div id="promotedNewBasicDisplay" class="p-2 border rounded"></div>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-medium">In-Charge Allowance
+                                                        Effective Period:</label>
+                                                    <div class="d-flex gap-2 mb-2">
+                                                        <span class="small text-muted">From:</span>
+                                                        <select id="inChargeFromMonth" class="form-select flex-fill">
+                                                            <option>Month</option>
+                                                        </select>
+                                                        <select id="inChargeFromYear" class="form-select flex-fill">
+                                                            <option>Year</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <span class="small text-muted">Up to:</span>
+                                                        <select id="inChargeUpToMonth" class="form-select flex-fill">
+                                                            <option>Month</option>
+                                                        </select>
+                                                        <select id="inChargeUpToYear" class="form-select flex-fill">
+                                                            <option>Year</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Income Tax Rate -->
+                                            <div class="row g-3 mt-3">
+                                                <div class="col-12 col-md-4">
+                                                    <label for="annualTaxRate"
+                                                        class="form-label small fw-medium">Estimated Annual Income Tax
+                                                        Rate on Arrears:</label>
+                                                    <select id="annualTaxRate" class="form-select">
+                                                        <option value="0.00">0% (No Deduction)</option>
+                                                        <option value="0.05">5%</option>
+                                                        <option value="0.10">10%</option>
+                                                        <option value="0.15">15%</option>
+                                                        <option value="0.20" selected>20%</option>
+                                                        <option value="0.25">25%</option>
+                                                        <option value="0.30">30%</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="accordion-item section-card mb-3">
+                                <h2 class="accordion-header" id="headingInputs-leave">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseInputs-leave" aria-expanded="false"
+                                        aria-controls="collapseInputs-leave">
+                                        5. Leave Encashment Arrears (Max 3 Instances, 15 Days Max per Instance)
+                                    </button>
+                                </h2>
+                                <div id="collapseInputs-leave" class="accordion-collapse collapse show"
+                                    aria-labelledby="headingInputs-leave">
+                                    <div class="accordion-body">
+                                        <!-- Leave Encashment Arrears Section -->
+                                        <div class="mt-4 border-top pt-3">
+
+                                            <div id="le-instances-container" class="mb-3">
+                                                <!-- Instance 1 -->
+                                                <div class="row g-2 align-items-end le-instance mb-3" data-instance="1">
+                                                    <div class="col-12 border-bottom pb-1 text-dark fw-medium">
+                                                        Instance 1:
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="le-start-1" class="form-label small text-muted">Date
+                                                            From:</label>
+                                                        <input type="date" id="le-start-1"
+                                                            class="form-control form-control-sm" min="2022-08-01">
+                                                    </div>
+                                                    <div class="col-6 col-md-3">
+                                                        <label for="le-days-1" class="form-label small text-muted">Days
+                                                            Encashment (Max 15):</label>
+                                                        <input type="number" id="le-days-1"
+                                                            class="form-control form-control-sm" min="0" max="15"
+                                                            value="0">
+                                                    </div>
+                                                    <div class="col-6 col-md-3 text-end">
+                                                        <span class="small fw-semibold text-dark">Arrear (₹): <span
+                                                                id="le-arrear-1">0</span></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Instance 2 -->
+                                                <div class="row g-2 align-items-end le-instance mb-3" data-instance="2">
+                                                    <div class="col-12 border-bottom pb-1 text-dark fw-medium">
+                                                        Instance 2:
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="le-start-2" class="form-label small text-muted">Date
+                                                            From:</label>
+                                                        <input type="date" id="le-start-2"
+                                                            class="form-control form-control-sm" min="2022-08-01">
+                                                    </div>
+                                                    <div class="col-6 col-md-3">
+                                                        <label for="le-days-2" class="form-label small text-muted">Days
+                                                            Encashment (Max 15):</label>
+                                                        <input type="number" id="le-days-2"
+                                                            class="form-control form-control-sm" min="0" max="15"
+                                                            value="0">
+                                                    </div>
+                                                    <div class="col-6 col-md-3 text-end">
+                                                        <span class="small fw-semibold text-dark">Arrear (₹): <span
+                                                                id="le-arrear-2">0</span></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Instance 3 -->
+                                                <div class="row g-2 align-items-end le-instance mb-3" data-instance="3">
+                                                    <div class="col-12 border-bottom pb-1 text-dark fw-medium">
+                                                        Instance 3:
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="le-start-3" class="form-label small text-muted">Date
+                                                            From:</label>
+                                                        <input type="date" id="le-start-3"
+                                                            class="form-control form-control-sm" min="2022-08-01">
+                                                    </div>
+                                                    <div class="col-6 col-md-3">
+                                                        <label for="le-days-3" class="form-label small text-muted">Days
+                                                            Encashment (Max 15):</label>
+                                                        <input type="number" id="le-days-3"
+                                                            class="form-control form-control-sm" min="0" max="15"
+                                                            value="0">
+                                                    </div>
+                                                    <div class="col-6 col-md-3 text-end">
+                                                        <span class="small fw-semibold text-dark">Arrear (₹): <span
+                                                                id="le-arrear-3">0</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="d-flex justify-content-between align-items-center bg-warning-subtle border border-warning rounded p-2">
+                                                <span class="fw-bold small text-dark">Total Leave Encashment
+                                                    Arrears:</span>
+                                                <span id="total-le-arrears" class="fw-bold text-primary">₹0</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label for="promotedCadre" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-                        Promoted Cadre:
-                    </label>
-                    <select id="promotedCadre" class="form-select w-full p-2.5 bg-white"></select>
-                </div>
-                <div>
-                    <label for="promotedOldBasic" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        Promoted Basic Pay (₹):
-                    </label>
-                    <select id="promotedOldBasic" class="form-select w-full p-2.5 bg-white"></select>
-                </div>
-                <div class="col-span-1">
-                    <label for="promotedNewBasicDisplay" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
-                        New Basic (Promoted) (₹):
-                    </label>
-                    <div id="promotedNewBasicDisplay" class="new-basic-display w-full p-2.5"></div>
-                </div>
-                <div class="col-span-2 md:col-span-1">
-                    <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="10" y1="15" x2="10" y2="15"></line></svg>
-                        In-Charge Allowance Effective Period:
-                    </label>
-                    <div class="flex gap-2 mb-2">
-                        <span class="text-sm font-medium text-gray-500">From:</span>
-                        <select id="inChargeFromMonth" class="form-select p-2.5 bg-white flex-1">
-                            <option value="">Month</option>
-                        </select>
-                        <select id="inChargeFromYear" class="form-select p-2.5 bg-white flex-1">
-                            <option value="">Year</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-sm font-medium text-gray-500">Up to:</span>
-                        <select id="inChargeUpToMonth" class="form-select p-2.5 bg-white flex-1">
-                            <option value="">Month</option>
-                        </select>
-                        <select id="inChargeUpToYear" class="form-select p-2.5 bg-white flex-1">
-                            <option value="">Year</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Income Tax Rate for Arrears -->
-            <div class="input-card mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="col-span-1">
-                    <label for="annualTaxRate" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-red-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V5H6.5A2.5 2.5 0 0 0 4 7.5v12"></path></svg>
-                        Estimated Annual Income Tax Rate on Arrears:
-                    </label>
-                    <select id="annualTaxRate" class="form-select w-full p-2.5 bg-white">
-                        <option value="0.00">0% (No Deduction)</option>
-                        <option value="0.05">5%</option>
-                        <option value="0.10">10%</option>
-                        <option value="0.15">15%</option>
-                        <option value="0.20" selected>20%</option>
-                        <option value="0.25">25%</option>
-                        <option value="0.30">30%</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- NEW: Leave Encashment Arrears Section -->
-            <div class="input-card mt-6 border-t pt-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-3 section-header">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M12 16h.01"></path><path d="M16 16h.01"></path><path d="M8 12h.01"></path><path d="M16 12h.01"></path></svg>
-                    Leave Encashment Arrears (Max 3 Instances, 15 Days Max per Instance)
-                </h3>
-                <div id="le-instances-container" class="space-y-4">
-                    <!-- Instance 1 -->
-                    <div class="grid grid-cols-4 gap-4 items-end le-instance" data-instance="1">
-                        <div class="col-span-4 text-sm font-medium text-gray-700 border-b pb-1">Instance 1:</div>
-                        <div class="col-span-2">
-                            <label class="text-xs text-gray-500 block">Date From:</label>
-                            <input type="date" id="le-start-1" class="form-input w-full p-2.5 text-sm" min="2022-08-01" max="">
-                        </div>
-                        
-                        <div class="col-span-1">
-                            <label class="text-xs text-gray-500 block">Days Encashment (Max 15):</label>
-                            <input type="number" id="le-days-1" class="form-input w-full p-2.5 text-sm" min="0" max="15" value="0">
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <span class="text-sm font-semibold text-gray-700">Arrear (₹): <span id="le-arrear-1">0</span></span>
-                        </div>
-                    </div>
-                    <!-- Instance 2 -->
-                    <div class="grid grid-cols-4 gap-4 items-end le-instance" data-instance="2">
-                        <div class="col-span-4 text-sm font-medium text-gray-700 border-b pb-1">Instance 2:</div>
-                        <div class="col-span-2">
-                            <label class="text-xs text-gray-500 block">Date From:</label>
-                            <input type="date" id="le-start-2" class="form-input w-full p-2.5 text-sm" min="2022-08-01" max="">
-                        </div>
-                        
-                        <div class="col-span-1">
-                            <label class="text-xs text-gray-500 block">Days Encashment (Max 15):</label>
-                            <input type="number" id="le-days-2" class="form-input w-full p-2.5 text-sm" min="0" max="15" value="0">
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <span class="text-sm font-semibold text-gray-700">Arrear (₹): <span id="le-arrear-2">0</span></span>
-                        </div>
-                    </div>
-                    <!-- Instance 3 -->
-                    <div class="grid grid-cols-4 gap-4 items-end le-instance" data-instance="3">
-                        <div class="col-span-4 text-sm font-medium text-gray-700 border-b pb-1">Instance 3:</div>
-                        <div class="col-span-2">
-                            <label class="text-xs text-gray-500 block">Date From:</label>
-                            <input type="date" id="le-start-3" class="form-input w-full p-2.5 text-sm" min="2022-08-01" max="">
-                        </div>
-                        
-                        <div class="col-span-1">
-                            <label class="text-xs text-gray-500 block">Days Encashment (Max 15):</label>
-                            <input type="number" id="le-days-3" class="form-input w-full p-2.5 text-sm" min="0" max="15" value="0">
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <span class="text-sm font-semibold text-gray-700">Arrear (₹): <span id="le-arrear-3">0</span></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4 flex justify-between items-center bg-yellow-100 p-3 rounded-md border border-yellow-300">
-                    <span class="font-bold text-sm text-gray-800">Total Leave Encashment Arrears:</span>
-                    <span id="total-le-arrears" class="font-bold text-md text-indigo-600">₹0</span>
                 </div>
             </div>
 
-            <!-- Total Arrears & Export -->
-            <div class="flex flex-col mt-6 border-t pt-4">
-                <p class="text-xs text-gray-500 mb-2">
-                    These figures are provided for estimation purposes only. The final arrear amount is subject to change pending a comprehensive and definitive calculation.
-                </p>
-                <div class="flex items-center justify-between text-lg font-bold text-gray-900 bg-white p-3 rounded-lg border border-indigo-400 shadow-md">
-                    <span>Estimated **Total Net Arrears** (Monthly + LE, After Deduction & **Tax**):</span>
-                    <span id="total-arrears" class="text-green-600 text-2xl font-extrabold">₹</span>
+            <!-- Panel 2: Export / Help -->
+            <div class="accordion-item section-card mb-3">
+                <h2 class="accordion-header" id="headingExport">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseExport" aria-expanded="false" aria-controls="collapseExport">
+                        2. Export / Help
+                    </button>
+                </h2>
+                <div id="collapseExport" class="accordion-collapse collapse" aria-labelledby="headingExport">
+                    <div class="accordion-body">
+                        <!-- Total Arrears & Export -->
+                        <div class="mt-3 border-top pt-3">
+                            <p class="small text-muted mb-2">
+                                These figures are provided for estimation purposes only. The final arrear amount
+                                is subject to change pending a comprehensive and definitive calculation.
+                            </p>
+
+                            <div
+                                class="d-flex justify-content-between align-items-center bg-white p-3 rounded border border-primary shadow-sm mb-3">
+                                <span>Estimated <strong>Total Net Arrears</strong> (Monthly + LE, After Deduction &
+                                    <strong>Tax</strong>):</span>
+                                <span id="total-arrears" class="text-success fs-2 fw-bold">₹</span>
+                            </div>
+
+                            <button id="exportBtn" class="btn btn-primary">
+                                Export Detailed Arrears Breakdown to CSV
+                            </button>
+                        </div>
+
+                        <!-- Monthly Arrears Table -->
+                        <div id="monthly-arrears-section" class="mt-4">
+                            <h3 class="fs-5 fw-semibold text-dark mb-3 border-bottom pb-2 section-header">
+                                Monthly Arrears Breakdown
+                            </h3>
+                            <div class="table-responsive p-2 section-card">
+                                <table id="arrearsTable"
+                                    class="table table-striped table-bordered table-hover table-sm mb-0">
+                                    <thead class="table-light">
+                                        <tr class="text-center">
+                                            <th>Month</th>
+                                            <th>Old Gross (A)</th>
+                                            <th>New Gross (B)</th>
+                                            <th>Gross Diff (B-A)</th>
+                                            <th>Old Ded. (C)</th>
+                                            <th>New Ded. (D)</th>
+                                            <th>Ded. Diff (D-C)</th>
+                                            <th>Old Net (A-C)</th>
+                                            <th>New Net (B-D)</th>
+                                            <th class="increase-cell">Net Arrears (Diff)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="monthly-arrears-body"></tbody>
+                                    <tfoot id="monthly-arrears-foot" class="d-none text-muted small">
+                                        <!-- Footer for data aggregation / CSV export -->
+                                        <tr>
+                                            <td>Grand Total</td>
+                                            <td id="monthly-old-gross-total"></td>
+                                            <td id="monthly-new-gross-total"></td>
+                                            <td id="monthly-gross-diff-total"></td>
+                                            <td id="monthly-old-deduction-total"></td>
+                                            <td id="monthly-new-deduction-total"></td>
+                                            <td id="monthly-deduction-diff-total"></td>
+                                            <td id="monthly-old-net-total"></td>
+                                            <td id="monthly-new-net-total"></td>
+                                            <td class="increase-cell" id="monthly-net-diff-total"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- NEW: NPS Arrear Adjustment Summary -->
+                            <div id="nps-adjustment-summary"
+                                class="mt-3 p-3 bg-danger-subtle border border-danger rounded shadow-sm">
+                                <h4 class="small fw-bold text-danger mb-2">
+                                    NPS Arrear Adjustment Summary (for NPS Subscribers Only)
+                                </h4>
+
+                                <table class="table table-borderless table-sm text-danger mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-semibold text-start py-1">Total NPS Employee Ded. Arrear (10%
+                                                Diff)</td>
+                                            <td class="text-end py-1"><span id="nps-employee-ded-arrear"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold text-start py-1">Total NPS Employer Cont. Arrear (14%
+                                                Diff)</td>
+                                            <td class="text-end py-1"><span id="nps-employer-cont-arrear"></span></td>
+                                        </tr>
+                                        <tr class="fw-bold border-top border-danger">
+                                            <td class="text-start py-1">Total NPS Arrears Retained (Employee + Employer
+                                                Difference)</td>
+                                            <td class="text-end py-1"><span id="nps-total-retained-arrear"></span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Tax Summary for Arrears -->
+                            <div class="mt-3 p-3 bg-warning-subtle border border-warning rounded shadow-sm">
+                                <h6 class="small fw-semibold text-dark mb-2">Tax Summary (Applied to Total Arrears):
+                                </h6>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless table-sm mb-0">
+                                        <tbody>
+                                            <tr>
+                                                <td class="fw-semibold">Total Monthly Net Arrears</td>
+                                                <td class="text-end font-monospace" id="pre-tax-arrears"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-semibold">Total Leave Encashment Arrears</td>
+                                                <td class="text-end font-monospace" id="le-arrears-summary"></td>
+                                            </tr>
+                                            <tr class="fw-bold border-top">
+                                                <td>Total Gross Arrears (Monthly Net + LE)</td>
+                                                <td class="text-end font-monospace text-success"
+                                                    id="combined-pre-tax-arrears"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tax Deducted (<span id="tax-rate-display"></span>)</td>
+                                                <td class="text-end font-monospace text-danger"
+                                                    id="tax-deducted-display"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-                <button id="exportBtn" class="mt-4 px-4 py-3 bg-blue-600 text-white rounded-lg shadow-xl hover:bg-blue-700 transition-colors transform hover:scale-[1.01]">Export Detailed Arrears Breakdown to CSV</button>
-                 
             </div>
 
-            <!-- Monthly Arrears Table -->
-            <div id="monthly-arrears-section" class="mt-8 hidden">
-                <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2 section-header">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-500"><path d="M3 10L12 2l9 8-9 8-9-8z"></path><path d="M12 22l-9-8L12 6l9 8z"></path></svg>
-                    Monthly Arrears Breakdown
-                </h3>
-                <div class="overflow-x-auto rounded-lg border shadow-lg">
-                    <table class="w-full text-xs text-gray-700 comparison-table">
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Old Gross (A)</th>
-                                <th>New Gross (B)</th>
-                                <th>Gross Diff (B-A)</th>
-                                <th>Old Ded. (C)</th>
-                                <th>New Ded. (D)</th>
-                                <th>Ded. Diff (D-C)</th>
-                                <th>Old Net (A-C)</th>
-                                <th>New Net (B-D)</th>
-                                <th class="increase-cell">Net Arrears (Diff)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="monthly-arrears-body"></tbody>
-                        <tfoot id="monthly-arrears-foot" class="total-row text-sm hidden">
-                            <!-- This footer is used for data aggregation for CSV export only, hidden from view -->
-                            <tr>
-                                <td>Grand Total</td>
-                                <td id="monthly-old-gross-total"></td>
-                                <td id="monthly-new-gross-total"></td>
-                                <td id="monthly-gross-diff-total"></td>
-                                <td id="monthly-old-deduction-total"></td>
-                                <td id="monthly-new-deduction-total"></td>
-                                <td id="monthly-deduction-diff-total"></td>
-                                <td id="monthly-old-net-total"></td>
-                                <td id="monthly-new-net-total"></td>
-                                <td class="increase-cell" id="monthly-net-diff-total"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                
-                <!-- NEW: NPS Arrear Adjustment Summary -->
-                <div id="nps-adjustment-summary" class="mt-4 p-3 bg-red-100 border border-red-300 rounded-md shadow-inner hidden">
-                    <h4 class="text-sm font-bold text-red-800 mb-2">NPS Arrear Adjustment Summary (for NPS Subscribers Only)</h4>
-                    <table class="w-full text-xs text-red-700">
-                        <tbody>
-                            <tr>
-                                <td class="py-1 px-0 text-left font-semibold">Total NPS Employee Ded. Arrear (10% Diff)</td>
-                                <td class="py-1 px-0 text-right"><span id="nps-employee-ded-arrear"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="py-1 px-0 text-left font-semibold">Total NPS Employer Cont. Arrear (14% Diff)</td>
-                                <td class="py-1 px-0 text-right"><span id="nps-employer-cont-arrear"></span></td>
-                            </tr>
-                            <tr class="font-extrabold border-t border-red-500">
-                                <td class="py-1 px-0 text-left">Total NPS Arrears Retained (Employee + Employer Difference)</td>
-                                <td class="py-1 px-0 text-right"><span id="nps-total-retained-arrear"></span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Tax Summary for Arrears -->
-                <div class="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-md shadow-inner">
-                    <p class="text-sm font-semibold text-gray-700">Tax Summary (Applied to Total Arrears):</p>
-                    <p class="text-xs text-gray-600">Total Monthly Net Arrears: <span id="pre-tax-arrears" class="font-mono"></span></p>
-                    <p class="text-xs text-gray-600">Total Leave Encashment Arrears: <span id="le-arrears-summary" class="font-mono"></span></p>
-                    <p class="text-xs font-bold text-gray-800 border-t pt-1 mt-1">Total Gross Arrears (Monthly Net + LE): <span id="combined-pre-tax-arrears" class="font-mono text-green-700"></span></p>
-                    <p class="text-xs text-gray-600">Tax Deducted (<span id="tax-rate-display"></span>): <span id="tax-deducted-display" class="font-mono text-red-600"></span></p>
-                </div>
-            </div>
+            <footer class="mt-4 small-muted text-center">
+                Disclaimer: The figures presented are based on a tentative proposal and are subject to
+                modification upon
+                the
+                finalization of the revised offer from GIPSA. Any minor errors or discrepancies should
+                be
+                disregarded
+                pending the release of the official notification.
+            </footer>
         </div>
-        <div id="messageBox" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-200 text-yellow-800 px-6 py-3 rounded-lg shadow-lg z-50"></div>
-
-        
-
-        <footer class="footer text-xs text-center text-white">
-            Disclaimer: The figures presented are based on a tentative proposal and are subject to modification upon the finalization of the revised offer from GIPSA. Any minor errors or discrepancies should be disregarded pending the release of the official notification.
-        </footer>
     </div>
 
+    <!-- About modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutLabel">About — GIPSA Arrears Calculator
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body small-muted">
+                    <p>GIPA wage revision calculator 2025
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // --- DATA STRUCTURES ---
         const salaryData = {
             "Sub-Staff": {
-                payMap: [{old:18100,new:29320},{old:18840,new:30520},{old:29580,new:31720},{old:20320,new:32920},{old:21060,new:34120},{old:21800,new:35320},{old:22585,new:36595},{old:23370,new:37870},{old:24155,new:39145},{old:24940,new:40420},{old:25725,new:41695},{old:26510,new:42970},{old:27295,new:44245},{old:28080,new:45520},{old:29015,new:47035},{old:29985,new:48605},{old:30955,new:50175},{old:32115,new:52055},{old:33275,new:53935},{old:34435,new:55815},{old:35595,new:57695},{old:36755,new:59575},{old:37915,new:61455},{old:39075,new:63335},{old:40235,new:65215},{old:41395,new:67095},{old:43300,new:70180}],
-                allowances: { }, 
+                payMap: [{ old: 18100, new: 29320 }, { old: 18840, new: 30520 }, { old: 29580, new: 31720 }, { old: 20320, new: 32920 }, { old: 21060, new: 34120 }, { old: 21800, new: 35320 }, { old: 22585, new: 36595 }, { old: 23370, new: 37870 }, { old: 24155, new: 39145 }, { old: 24940, new: 40420 }, { old: 25725, new: 41695 }, { old: 26510, new: 42970 }, { old: 27295, new: 44245 }, { old: 28080, new: 45520 }, { old: 29015, new: 47035 }, { old: 29985, new: 48605 }, { old: 30955, new: 50175 }, { old: 32115, new: 52055 }, { old: 33275, new: 53935 }, { old: 34435, new: 55815 }, { old: 35595, new: 57695 }, { old: 36755, new: 59575 }, { old: 37915, new: 61455 }, { old: 39075, new: 63335 }, { old: 40235, new: 65215 }, { old: 41395, new: 67095 }, { old: 43300, new: 70180 }],
+                allowances: {},
                 category: 'below_sr_assistant'
             },
             "Driver": {
-                payMap: [{old:20785,new:33670},{old:21685,new:35130},{old:22585,new:36590},{old:23520,new:38105},{old:24455,new:39620},{old:25390,new:41135},{old:26325,new:42650},{old:27260,new:44165},{old:28195,new:45680},{old:29130,new:47195},{old:30065,new:48710},{old:31000,new:50225},{old:31935,new:51740},{old:32870,new:53255},{old:33805,new:54770},{old:34740,new:56285},{old:35675,new:57800},{old:36705,new:61140},{old:37735,new:61140},{old:38895,new:63020},{old:40055,new:64900},{old:41215,new:66780},{old:42375,new:68660},{old:43535,new:70540},{old:44695,new:72420},{old:45855,new:74300},{old:47015,new:76180},{old:48175,new:78060}],
-                allowances: { }, 
+                payMap: [{ old: 20785, new: 33670 }, { old: 21685, new: 35130 }, { old: 22585, new: 36590 }, { old: 23520, new: 38105 }, { old: 24455, new: 39620 }, { old: 25390, new: 41135 }, { old: 26325, new: 42650 }, { old: 27260, new: 44165 }, { old: 28195, new: 45680 }, { old: 29130, new: 47195 }, { old: 30065, new: 48710 }, { old: 31000, new: 50225 }, { old: 31935, new: 51740 }, { old: 32870, new: 53255 }, { old: 33805, new: 54770 }, { old: 34740, new: 56285 }, { old: 35675, new: 57800 }, { old: 36705, new: 61140 }, { old: 37735, new: 61140 }, { old: 38895, new: 63020 }, { old: 40055, new: 64900 }, { old: 41215, new: 66780 }, { old: 42375, new: 68660 }, { old: 43535, new: 70540 }, { old: 44695, new: 72420 }, { old: 45855, new: 74300 }, { old: 47015, new: 76180 }, { old: 48175, new: 78060 }],
+                allowances: {},
                 category: 'below_sr_assistant'
             },
             "Record Clerk": {
-                payMap: [{old:20785,new:33670},{old:21685,new:35130},{old:22585,new:36590},{old:23550,new:38155},{old:24515,new:39720},{old:25480,new:41285},{old:26445,new:42850},{old:27410,new:44415},{old:28440,new:46085},{old:29595,new:47960},{old:30750,new:49835},{old:32025,new:51900},{old:33300,new:53965},{old:34575,new:56030},{old:35995,new:58330},{old:37415,new:60630},{old:38835,new:62930},{old:40255,new:65230},{old:41675,new:67530},{old:43255,new:70090},{old:44835,new:72650},{old:46415,new:75210},{old:47995,new:80330},{old:49575,new:80330},{old:51155,new:82890},{old:52735,new:85450},{old:54315,new:88010},{old:55895,new:90570}],
-                allowances: { }, 
+                payMap: [{ old: 20785, new: 33670 }, { old: 21685, new: 35130 }, { old: 22585, new: 36590 }, { old: 23550, new: 38155 }, { old: 24515, new: 39720 }, { old: 25480, new: 41285 }, { old: 26445, new: 42850 }, { old: 27410, new: 44415 }, { old: 28440, new: 46085 }, { old: 29595, new: 47960 }, { old: 30750, new: 49835 }, { old: 32025, new: 51900 }, { old: 33300, new: 53965 }, { old: 34575, new: 56030 }, { old: 35995, new: 58330 }, { old: 37415, new: 60630 }, { old: 38835, new: 62930 }, { old: 40255, new: 65230 }, { old: 41675, new: 67530 }, { old: 43255, new: 70090 }, { old: 44835, new: 72650 }, { old: 46415, new: 75210 }, { old: 47995, new: 80330 }, { old: 49575, new: 80330 }, { old: 51155, new: 82890 }, { old: 52735, new: 85450 }, { old: 54315, new: 88010 }, { old: 55895, new: 90570 }],
+                allowances: {},
                 category: 'below_sr_assistant'
             },
             "Assistant": {
-                payMap: [{old:22405,new:36290},{old:23710,new:38405},{old:25135,new:40630},{old:26560,new:42855},{old:28165,new:45365},{old:29770,new:47875},{old:31375,new:50385},{old:32980,new:52895},{old:34585,new:55405},{old:36440,new:58410},{old:38295,new:61415},{old:40555,new:65075},{old:42815,new:68735},{old:45075,new:72395},{old:47420,new:76275},{old:49765,new:80155},{old:52265,new:84085},{old:54765,new:88015},{old:57265,new:91945},{old:59765,new:95875},{old:62265,new:99805},{old:64765,new:103735},{old:67265,new:107665},{old:69765,new:111595},{old:72265,new:115525},{old:74765,new:119455},{old:77265,new:123385},{old:79765,new:127315}],
-                allowances: { }, 
+                payMap: [{ old: 22405, new: 36290 }, { old: 23710, new: 38405 }, { old: 25135, new: 40630 }, { old: 26560, new: 42855 }, { old: 28165, new: 45365 }, { old: 29770, new: 47875 }, { old: 31375, new: 50385 }, { old: 32980, new: 52895 }, { old: 34585, new: 55405 }, { old: 36440, new: 58410 }, { old: 38295, new: 61415 }, { old: 40555, new: 65075 }, { old: 42815, new: 68735 }, { old: 45075, new: 72395 }, { old: 47420, new: 76275 }, { old: 49765, new: 80155 }, { old: 52265, new: 84085 }, { old: 54765, new: 88015 }, { old: 57265, new: 91945 }, { old: 59765, new: 95875 }, { old: 62265, new: 99805 }, { old: 64765, new: 103735 }, { old: 67265, new: 107665 }, { old: 69765, new: 111595 }, { old: 72265, new: 115525 }, { old: 74765, new: 119455 }, { old: 77265, new: 123385 }, { old: 79765, new: 127315 }],
+                allowances: {},
                 category: 'below_sr_assistant'
             },
             "Sr. Assistant": {
-                payMap: [{old:31370,new:50815},{old:33615,new:54455},{old:35860,new:58095},{old:38105,new:61735},{old:40350,new:65375},{old:42850,new:69425},{old:45350,new:73475},{old:47850,new:77525},{old:50350,new:81575},{old:52850,new:85625},{old:55350,new:89675},{old:57850,new:93725},{old:60350,new:97775},{old:62850,new:101825},{old:65350,new:105875},{old:67850,new:109925},{old:70350,new:113975},{old:72850,new:118025},{old:75350,new:122075},{old:77850,new:126125},{old:80350,new:130175},{old:82850,new:134225},{old:85350,new:138275},{old:87850,new:142325},{old:90350,new:146375},{old:92850,new:150425},{old:95350,new:154475},{old:97850,new:158525}],
-                allowances: { }, 
+                payMap: [{ old: 31370, new: 50815 }, { old: 33615, new: 54455 }, { old: 35860, new: 58095 }, { old: 38105, new: 61735 }, { old: 40350, new: 65375 }, { old: 42850, new: 69425 }, { old: 45350, new: 73475 }, { old: 47850, new: 77525 }, { old: 50350, new: 81575 }, { old: 52850, new: 85625 }, { old: 55350, new: 89675 }, { old: 57850, new: 93725 }, { old: 60350, new: 97775 }, { old: 62850, new: 101825 }, { old: 65350, new: 105875 }, { old: 67850, new: 109925 }, { old: 70350, new: 113975 }, { old: 72850, new: 118025 }, { old: 75350, new: 122075 }, { old: 77850, new: 126125 }, { old: 80350, new: 130175 }, { old: 82850, new: 134225 }, { old: 85350, new: 138275 }, { old: 87850, new: 142325 }, { old: 90350, new: 146375 }, { old: 92850, new: 150425 }, { old: 95350, new: 154475 }, { old: 97850, new: 158525 }],
+                allowances: {},
                 category: 'below_sr_assistant'
             },
             "Scale I Officer (AO)": {
-                payMap: [{old:50925,new:82485},{old:53425,new:86535},{old:55925,new:90585},{old:58425,new:94635},{old:60925,new:98685},{old:63425,new:102735},{old:65925,new:106785},{old:68425,new:110835},{old:70925,new:114885},{old:73425,new:118935},{old:75925,new:122985},{old:78425,new:127035},{old:80925,new:131085},{old:83425,new:135135},{old:85925,new:139185},{old:88635,new:143575},{old:91345,new:147965},{old:94055,new:152355},{old:96765,new:156745},{old:99475,new:161135},{old:102185,new:165525},{old:104895,new:169915}],
+                payMap: [{ old: 50925, new: 82485 }, { old: 53425, new: 86535 }, { old: 55925, new: 90585 }, { old: 58425, new: 94635 }, { old: 60925, new: 98685 }, { old: 63425, new: 102735 }, { old: 65925, new: 106785 }, { old: 68425, new: 110835 }, { old: 70925, new: 114885 }, { old: 73425, new: 118935 }, { old: 75925, new: 122985 }, { old: 78425, new: 127035 }, { old: 80925, new: 131085 }, { old: 83425, new: 135135 }, { old: 85925, new: 139185 }, { old: 88635, new: 143575 }, { old: 91345, new: 147965 }, { old: 94055, new: 152355 }, { old: 96765, new: 156745 }, { old: 99475, new: 161135 }, { old: 102185, new: 165525 }, { old: 104895, new: 169915 }],
                 allowances: { "Functional": { old: 2710, new: 4390 } },
                 category: 'above_ao'
             },
             "Scale II Officer (Asst. Manager)": {
-                payMap: [{old:68425,new:110830},{old:70925,new:114880},{old:73425,new:118930},{old:75925,new:122980},{old:78425,new:127030},{old:80925,new:131080},{old:83425,new:135130},{old:85925,new:139180},{old:88635,new:143570},{old:91345,new:147960},{old:94055,new:152350},{old:96765,new:156740},{old:99475,new:161130},{old:102185,new:165520},{old:104895,new:169915},{old:107605,new:174300},{old:110315,new:178690},{old:113025,new:183080},{old:115735,new:187470}],
+                payMap: [{ old: 68425, new: 110830 }, { old: 70925, new: 114880 }, { old: 73425, new: 118930 }, { old: 75925, new: 122980 }, { old: 78425, new: 127030 }, { old: 80925, new: 131080 }, { old: 83425, new: 135130 }, { old: 85925, new: 139180 }, { old: 88635, new: 143570 }, { old: 91345, new: 147960 }, { old: 94055, new: 152350 }, { old: 96765, new: 156740 }, { old: 99475, new: 161130 }, { old: 102185, new: 165520 }, { old: 104895, new: 169915 }, { old: 107605, new: 174300 }, { old: 110315, new: 178690 }, { old: 113025, new: 183080 }, { old: 115735, new: 187470 }],
                 allowances: { "Functional": { old: 2710, new: 4390 } },
                 category: 'above_ao'
             },
             "Scale III Officer (Dy. Manager)": {
-                payMap: [{old:83425,new:135130},{old:85925,new:139180},{old:88635,new:143570},{old:91345,new:147960},{old:94055,new:152350},{old:96765,new:156740},{old:99475,new:161130},{old:102185,new:165520},{old:105755,new:171305},{old:109325,new:177090},{old:112895,new:182875},{old:116465,new:188660},{old:120035,new:194445},{old:123605,new:200230},{old:127175,new:206015}],
+                payMap: [{ old: 83425, new: 135130 }, { old: 85925, new: 139180 }, { old: 88635, new: 143570 }, { old: 91345, new: 147960 }, { old: 94055, new: 152350 }, { old: 96765, new: 156740 }, { old: 99475, new: 161130 }, { old: 102185, new: 165520 }, { old: 105755, new: 171305 }, { old: 109325, new: 177090 }, { old: 112895, new: 182875 }, { old: 116465, new: 188660 }, { old: 120035, new: 194445 }, { old: 123605, new: 200230 }, { old: 127175, new: 206015 }],
                 allowances: { "Functional": { old: 3570, new: 5785 } },
                 category: 'above_ao'
             },
             "Scale IV Officer (Manager)": {
-                payMap: [{old:102185,new:165520},{old:105755,new:171305},{old:109325,new:177090},{old:112895,new:182875},{old:116465,new:188660},{old:120035,new:194445},{old:123605,new:200230},{old:127175,new:206015},{old:130745,new:211800},{old:134315,new:217585}],
+                payMap: [{ old: 102185, new: 165520 }, { old: 105755, new: 171305 }, { old: 109325, new: 177090 }, { old: 112895, new: 182875 }, { old: 116465, new: 188660 }, { old: 120035, new: 194445 }, { old: 123605, new: 200230 }, { old: 127175, new: 206015 }, { old: 130745, new: 211800 }, { old: 134315, new: 217585 }],
                 allowances: { "Functional": { old: 3570, new: 5785 } },
                 category: 'above_ao'
             },
             "Scale V Officer (Chief Manager)": {
-                payMap: [{old:123605,new:200230},{old:127175,new:206015},{old:130745,new:211800},{old:134315,new:217585},{old:138335,new:224100},{old:142355,new:230615},{old:146375,new:237130},{old:150395,new:243645},{old:154415,new:250160},{old:158435,new:256675}],
+                payMap: [{ old: 123605, new: 200230 }, { old: 127175, new: 206015 }, { old: 130745, new: 211800 }, { old: 134315, new: 217585 }, { old: 138335, new: 224100 }, { old: 142355, new: 230615 }, { old: 146375, new: 237130 }, { old: 150395, new: 243645 }, { old: 154415, new: 250160 }, { old: 158435, new: 256675 }],
                 allowances: { "Functional": { old: 4020, new: 6515 } },
                 category: 'above_ao',
                 noTransport: true
             },
             "Scale VI Officer (DGM)": {
-                payMap: [{old:138335,new:224100},{old:142505,new:230855},{old:146675,new:237610},{old:150845,new:244365},{old:155015,new:251120},{old:159185,new:257875},{old:163355,new:264630},{old:167825,new:271870},{old:171695,new:278140}],
+                payMap: [{ old: 138335, new: 224100 }, { old: 142505, new: 230855 }, { old: 146675, new: 237610 }, { old: 150845, new: 244365 }, { old: 155015, new: 251120 }, { old: 159185, new: 257875 }, { old: 163355, new: 264630 }, { old: 167825, new: 271870 }, { old: 171695, new: 278140 }],
                 allowances: { "Functional": { old: 4170, new: 6755 } },
                 category: 'above_ao',
                 noTransport: true
             },
             "Scale VII Officer (GM)": {
-                payMap: [{old:155015,new:251120},{old:159185,new:257875},{old:163355,new:264630},{old:167825,new:271870},{old:172715,new:279790},{old:177785,new:288005},{old:182855,new:296220},{old:187925,new:304435},{old:192995,new:312650}],
+                payMap: [{ old: 155015, new: 251120 }, { old: 159185, new: 257875 }, { old: 163355, new: 264630 }, { old: 167825, new: 271870 }, { old: 172715, new: 279790 }, { old: 177785, new: 288005 }, { old: 182855, new: 296220 }, { old: 187925, new: 304435 }, { old: 192995, new: 312650 }],
                 allowances: { "Functional": { old: 5070, new: 8215 } },
                 category: 'above_ao',
                 noTransport: true
             },
             "Development Officer (D.O.) Gr. I": {
-                payMap: [{old:35815,new:58010},{old:38060,new:61650},{old:40305,new:65290},{old:42550,new:72570},{old:44795,new:72570},{old:47040,new:76210},{old:49285,new:79850},{old:51530,new:83490},{old:53775,new:87130},{old:56100,new:90900},{old:58425,new:94670},{old:60750,new:98440},{old:63075,new:102210},{old:65400,new:105980},{old:67725,new:109750},{old:70050,new:113520},{old:72375,new:117290},{old:74700,new:121060},{old:77135,new:125005},{old:79570,new:128950},{old:82070,new:133000},{old:84570,new:137050},{old:87070,new:141100},{old:89570,new:145150},{old:92070,new:149200},{old:94570,new:153250},{old:97070,new:157300},{old:99570,new:161350}],
+                payMap: [{ old: 35815, new: 58010 }, { old: 38060, new: 61650 }, { old: 40305, new: 65290 }, { old: 42550, new: 72570 }, { old: 44795, new: 72570 }, { old: 47040, new: 76210 }, { old: 49285, new: 79850 }, { old: 51530, new: 83490 }, { old: 53775, new: 87130 }, { old: 56100, new: 90900 }, { old: 58425, new: 94670 }, { old: 60750, new: 98440 }, { old: 63075, new: 102210 }, { old: 65400, new: 105980 }, { old: 67725, new: 109750 }, { old: 70050, new: 113520 }, { old: 72375, new: 117290 }, { old: 74700, new: 121060 }, { old: 77135, new: 125005 }, { old: 79570, new: 128950 }, { old: 82070, new: 133000 }, { old: 84570, new: 137050 }, { old: 87070, new: 141100 }, { old: 89570, new: 145150 }, { old: 92070, new: 149200 }, { old: 94570, new: 153250 }, { old: 97070, new: 157300 }, { old: 99570, new: 161350 }],
                 allowances: { "Functional": { old: 2710, new: 4390 } },
                 category: 'dev_officer'
             },
             "Development Officer (D.O.) Gr. II": {
-                payMap: [{old:24315,new:39385},{old:25920,new:41895},{old:27525,new:44405},{old:29130,new:46915},{old:30955,new:49875},{old:32780,new:52835},{old:34605,new:55795},{old:36430,new:58755},{old:38255,new:61715},{old:40080,new:64675},{old:41905,new:67635}],
+                payMap: [{ old: 24315, new: 39385 }, { old: 25920, new: 41895 }, { old: 27525, new: 44405 }, { old: 29130, new: 46915 }, { old: 30955, new: 49875 }, { old: 32780, new: 52835 }, { old: 34605, new: 55795 }, { old: 36430, new: 58755 }, { old: 38255, new: 61715 }, { old: 40080, new: 64675 }, { old: 41905, new: 67635 }],
                 allowances: { "Functional": { old: 2710, new: 4390 } },
                 category: 'dev_officer'
             }
@@ -644,15 +699,15 @@
             // General Allowances (Moved from cadre-specific to universal for easier selection/autofill)
             "Washing Allowance (Class IV)": { old: 355, new: 590, appliesToCadres: ["Sub-Staff", "Driver"] }, // Added appliesToCadres for auto-check logic
             "Sub-Staff Key Handling": { old: 1000, new: 1650, appliesToCadres: ["Sub-Staff"] }, // Added for auto-check logic
-            "Graduation Allowance": { old: 1535, new: 2600 }, 
+            "Graduation Allowance": { old: 1535, new: 2600 },
 
             // Entertainment Allowances (Disables Transport if selected)
             "Branch Office In-charge": { old: 1770, new: 2920, isEntertainment: true, noTransport: true },
-            "Divisional Office In-charge": { old: 1960, new: 3300, isEntertainment: true, noTransport: true }, 
-            
+            "Divisional Office In-charge": { old: 1960, new: 3300, isEntertainment: true, noTransport: true },
+
             // Marketing (Disables Transport)
-            "Marketing Functions (Non I/C)": { old: 0, new: 0, isMarketing: true, noTransport: true }, 
-            
+            "Marketing Functions (Non I/C)": { old: 0, new: 0, isMarketing: true, noTransport: true },
+
             // Other fixed allowances
             "Leased Accommodation (Remove HRA)": { old: 0, new: 0, isLeasedAccommodation: true },
             "Cashier": { old: 2120, new: 3450 },
@@ -663,34 +718,34 @@
             "TQ (Officer - Licentiate)": { old: 0, new: 800, isOfficerTQ: true },
             "TQ (Officer - Associateship)": { old: 0, new: 3200, isOfficerTQ: true },
             "TQ (Officer - Fellowship)": { old: 0.00, new: 6300, isOfficerTQ: true }, // RENAMED from Fellowship/CA/MBA
-            
+
             // Technical Qualification Allowances (TQ) - Clerical/Sub-Staff specific values
             "TQ (Clerical - Licentiate)": { old: 555, new: 915 },
             "TQ (Clerical - Associateship)": { old: 1505, new: 2485 },
             "TQ (Clerical - Fellowship/CA/MBA)": { old: 2575, new: 4245 },
-            
+
             // TQ allowances not specifically categorized yet, keeping original values
-            "TQ (Inter CA)": { old: 1080, new: 1780 }, 
+            "TQ (Inter CA)": { old: 1080, new: 1780 },
             "TQ (CA Final Grp A/B)": { old: 1845, new: 3045 }
         };
 
-        const hraData = { "A":{r:0.10,oMax:7840,nMax:13000}, "B":{r:0.08,oMax:6620,nMax:11000}, "C":{r:0.07,oMax:6370,nMax:10500} };
-        
+        const hraData = { "A": { r: 0.10, oMax: 7840, nMax: 13000 }, "B": { r: 0.08, oMax: 6620, nMax: 11000 }, "C": { r: 0.07, oMax: 6370, nMax: 10500 } };
+
         const ccaData = {
             "below_sr_assistant": {
-                "A": {r: 0.03, oMax: 1660, nMax: 2800}, 
-                "B": {r: 0.025, oMax: 1460, nMax: 2500},
-                "C": {r: 0.00, oMax: 0, nMax: 0}
+                "A": { r: 0.03, oMax: 1660, nMax: 2800 },
+                "B": { r: 0.025, oMax: 1460, nMax: 2500 },
+                "C": { r: 0.00, oMax: 0, nMax: 0 }
             },
             "dev_officer": {
-                "A": {r: 0.03, oMax: 1660, nMax: 2800}, 
-                "B": {r: 0.025, oMax: 1535, nMax: 2600},
-                "C": {r: 0.00, oMax: 0, nMax: 0}
+                "A": { r: 0.03, oMax: 1660, nMax: 2800 },
+                "B": { r: 0.025, oMax: 1535, nMax: 2600 },
+                "C": { r: 0.00, oMax: 0, nMax: 0 }
             },
             "above_ao": {
-                "A": {r: 0.025, oMax: 1960, nMax: 3300},
-                "B": {r: 0.025, oMax: 1865, nMax: 3100},
-                "C": {r: 0.00, oMax: 0, nMax: 0}
+                "A": { r: 0.025, oMax: 1960, nMax: 3300 },
+                "B": { r: 0.025, oMax: 1865, nMax: 3100 },
+                "C": { r: 0.00, oMax: 0, nMax: 0 }
             }
         };
 
@@ -745,7 +800,7 @@
         const promotionMonthSelect = document.getElementById('promotionMonth');
         const promotionYearSelect = document.getElementById('promotionYear');
         const contributionTypeSelect = document.getElementById('contributionType');
-        
+
         // RESTORED/NEW ARREARS TAX REFERENCES
         const annualTaxRateSelect = document.getElementById('annualTaxRate');
         const preTaxArrearsDisplay = document.getElementById('pre-tax-arrears');
@@ -767,7 +822,7 @@
         const newGrossTotalDisplay = document.getElementById('new-gross-total');
         const grossTotalIncreaseDisplay = document.getElementById('gross-total-increase');
         const grossTotalGrowthDisplay = document.getElementById('gross-total-growth');
-        
+
         const monthlyArrearsSection = document.getElementById('monthly-arrears-section');
         const monthlyArrearsBody = document.getElementById('monthly-arrears-body');
         const monthlyOldGrossTotal = document.getElementById('monthly-old-gross-total');
@@ -783,7 +838,7 @@
         const inChargeFromYearSelect = document.getElementById('inChargeFromYear');
         const inChargeUpToMonthSelect = document.getElementById('inChargeUpToMonth');
         const inChargeUpToYearSelect = document.getElementById('inChargeUpToYear');
-        
+
         // NPS Adjustment Summary DOM references
         const npsAdjustmentSummary = document.getElementById('nps-adjustment-summary');
         const npsEmployeeDedArrear = document.getElementById('nps-employee-ded-arrear');
@@ -793,7 +848,7 @@
 
         // --- HELPER FUNCTIONS ---
         // Formats a number to Indian currency format (lakhs/crores) with 0 decimal places.
-        const f = (val) => Math.round(val).toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        const f = (val) => Math.round(val).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         // Formats a float number for the tax summary
         const f_float = (val) => val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         // Parses date strings to YYYY-MM-DD for consistency
@@ -821,10 +876,10 @@
             const isEntertainmentAttr = amounts.isEntertainment ? `data-is-entertainment="true"` : '';
             const isMarketingAttr = amounts.isMarketing ? `data-is-marketing="true"` : ''; // Added marketing flag
             const isOfficerTQAttr = amounts.isOfficerTQ ? `data-is-officer-tq="true"` : ''; // Added officer TQ flag
-            
+
             const wrapper = document.createElement('div');
             // Reverted the styling for individual checkbox container
-            wrapper.className = 'flex items-center bg-gray-50 p-2 rounded-md border'; 
+            wrapper.className = 'flex items-center bg-gray-50 p-2 rounded-md border';
             wrapper.innerHTML = `<input id="${id}" type="checkbox" data-old-amount="${amounts.old}" data-new-amount="${amounts.new}" ${noTransportAttr} ${leasedAccommodationAttr} ${isEntertainmentAttr} ${isMarketingAttr} ${isOfficerTQAttr} class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 allowance-checkbox"><label for="${id}" class="ml-2 block text-sm text-gray-900">${name}</label>`;
             allowancesContainer.appendChild(wrapper);
         }
@@ -895,7 +950,7 @@
                 arrearsNewBasicDisplay.textContent = '0';
             }
         }
-        
+
         // Updates the new basic pay display for the promoted section
         function updatePromotedBasicDisplay() {
             const selectedOption = promotedOldBasicSelect.options[promotedOldBasicSelect.selectedIndex];
@@ -911,9 +966,9 @@
         function updateAllowances() {
             allowancesContainer.innerHTML = '';
             const selectedCadre = cadreSelect.value;
-            
+
             // 1. Create all checkboxes
-            if (salaryData[selectedCadre]) { 
+            if (salaryData[selectedCadre]) {
                 const cadreAllowances = salaryData[selectedCadre].allowances;
                 for (const [name, amounts] of Object.entries(cadreAllowances)) createCheckbox(name, amounts);
                 for (const [name, amounts] of Object.entries(universalAllowances)) createCheckbox(name, amounts);
@@ -946,7 +1001,7 @@
             arrearsCadreSelect.innerHTML = '<option value="">Select</option>';
             promotedCadreSelect.innerHTML = '<option value="">Select</option>';
             fpaCadreSelect.innerHTML = '<option value="">Select</option>';
-            
+
             cadres.forEach(c => {
                 const isSelected = c === initialCadre ? 'selected' : '';
                 const option = `<option value="${c}" ${isSelected}>${c}</option>`;
@@ -954,12 +1009,12 @@
                 arrearsCadreSelect.innerHTML += `<option value="${c}">${c}</option>`;
                 promotedCadreSelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
-            
+
             for (const cadre in fpaData) {
                 fpaCadreSelect.innerHTML += `<option value="${cadre}">${cadre}</option>`;
             }
         }
-        
+
         // Populates the year dropdowns (from 2022 to current year + 2).
         function populateYearDropdowns() {
             const currentYear = new Date().getFullYear();
@@ -977,11 +1032,11 @@
             populate(inChargeUpToYearSelect);
             populate(promotionYearSelect);
         }
-        
+
         // Populates the month dropdowns.
         function populateMonthDropdowns() {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            
+
             function populate(selectElement) {
                 selectElement.innerHTML = '<option value="">Month</option>';
                 months.forEach((month, index) => {
@@ -1010,11 +1065,11 @@
             const daRate = isNew ? daRateNew : daRateOld;
 
             const da = basic * daRate * daSlab;
-            
+
             const hraInfo = hraData[city];
             // HRA calculation: lower of (basic * rate) or max limit. Set to 0 if Leased Accommodation selected.
             const hra = isLeasedAccommodation ? 0 : Math.min(basic * hraInfo.r, isNew ? hraInfo.nMax : hraInfo.oMax);
-            
+
             const ccaInfo = ccaData[category][city];
             // CCA calculation: lower of (basic * rate) or max limit.
             const cca = Math.min(basic * ccaInfo.r, isNew ? ccaInfo.nMax : ccaInfo.oMax);
@@ -1024,10 +1079,10 @@
             if (transportData[category] && !noTransportFlag && !excludeTransport) {
                 transport = transportData[category][isNew ? 'new' : 'old'];
             }
-            
+
             return { basic: basic, da: da, hra: hra, cca: cca, transport: transport };
         }
-        
+
         // Renders a single row in the main comparison table.
         function renderRow(component, oldVal, newVal) {
             const increase = newVal - oldVal;
@@ -1037,22 +1092,22 @@
 
         // Renders the entire salary comparison table and the arrears section.
         function renderTable(oldSal, newSal, otherAllowances, isLeasedAccommodationSelected, noTransportFlag) {
-            
+
             // The combined gross totals are calculated in calculateAndDisplay and passed in oldSal/newSal.total
             let combinedOldGross = oldSal.total;
             let combinedNewGross = newSal.total;
 
             let rows = renderRow('Basic Pay', oldSal.basic, newSal.basic) +
-                        renderRow('Dearness Allowance', oldSal.da, newSal.da);
-            
+                renderRow('Dearness Allowance', oldSal.da, newSal.da);
+
             if (isLeasedAccommodationSelected) {
                 rows += renderRow('House Rent Allowance (Leased Accommodation Applied)', oldSal.hra, newSal.hra);
             } else {
                 rows += renderRow('House Rent Allowance', oldSal.hra, newSal.hra);
             }
-            
+
             rows += renderRow('City Compensatory Allowance', oldSal.cca, newSal.cca);
-            
+
             if (!noTransportFlag) {
                 rows += renderRow('Transport Allowance', oldSal.transport, newSal.transport);
             } else {
@@ -1060,20 +1115,20 @@
                 const exclusionReason = (salaryData[cadreSelect.value]?.noTransport) ? "(N/A for this Scale)" : "(Replaced by Allowance)";
                 rows += renderRow(`Transport Allowance ${exclusionReason}`, 0, 0);
             }
-            
+
             if (oldSal.entertainment > 0 || newSal.entertainment > 0) {
                 rows += renderRow('Entertainment/In-Charge Allowance (Transport not admissible)', oldSal.entertainment, newSal.entertainment);
             }
-            
+
             if (oldSal.fpa > 0 || newSal.fpa > 0) {
                 rows += renderRow('FPA (Fixed Personal Allowance)', oldSal.fpa, newSal.fpa);
             }
 
             for (const name in otherAllowances) {
                 // Ensure Leased Accommodation itself is not duplicated in the table (it's covered by HRA line)
-                 if (name !== 'Leased Accommodation (Remove HRA)') {
+                if (name !== 'Leased Accommodation (Remove HRA)') {
                     rows += renderRow(name, otherAllowances[name].old, otherAllowances[name].new);
-                 }
+                }
             }
 
             comparisonBody.innerHTML = rows;
@@ -1091,22 +1146,22 @@
         // --- LEAVE ENCASHMENT CALCULATION ---
         function calculateLeaveEncashmentArrears(arrearsData) {
             let totalLeArrears = 0;
-            
+
             leInputs.forEach(instance => {
                 let instanceArrear = 0;
                 const startDateStr = instance.start.value;
                 let days = parseInt(instance.days.value) || 0;
-                
+
                 // Cap days at 15
                 days = Math.min(days, 15);
                 instance.days.value = days; // Update display to show capped value
 
                 if (startDateStr && days > 0) {
                     const encashmentDate = new Date(startDateStr);
-                    
+
                     // Only process dates within the arrear period (and only need the start date for salary reference)
                     if (encashmentDate <= TODAY && encashmentDate >= EFFECTIVE_START_DATE) {
-                        
+
                         // Find the corresponding monthly salary state from the already calculated arrearsData
                         const startMonthIndex = arrearsData.findIndex(item => {
                             const itemDate = new Date(item.month.replace(/ /g, ' 1, '));
@@ -1115,22 +1170,22 @@
 
                         if (startMonthIndex !== -1) {
                             const monthData = arrearsData[startMonthIndex];
-                            
+
                             // Calculate LE Base components: Basic, DA, FPA, HRA, CCA (monthly amounts)
                             const oldLEBase = monthData.oldBasic + monthData.oldDA + monthData.oldFPA + monthData.oldHRA + monthData.oldCCA;
                             const newLEBase = monthData.newBasic + monthData.newDA + monthData.newFPA + monthData.newHRA + monthData.newCCA;
-                            
+
                             const diffLEBase = newLEBase - oldLEBase;
-                            
+
                             // LE Arrear = ( Difference in Monthly LE Base / 30 ) * Days Encased (Pro-rata basis)
                             instanceArrear = (diffLEBase / 30.0) * days;
-                            
+
                         } else {
-                             instanceArrear = 0;
+                            instanceArrear = 0;
                         }
                     }
                 }
-                
+
                 totalLeArrears += instanceArrear;
                 instance.arrearDisplay.textContent = f(instanceArrear);
             });
@@ -1142,7 +1197,7 @@
 
         // Renders the monthly arrears table and summary.
         function renderArrearsTable(data, totalMonthlyPreTaxArrears, totalLeArrears, taxDeducted, taxRate) {
-            
+
             // Recalculate NPS totals from monthly data for the summary display
             let totalNpsEmployeeDedArrear = 0;
             let totalNpsEmployerContArrear = 0;
@@ -1153,11 +1208,11 @@
             });
 
             const totalNpsRetainedArrear = totalNpsEmployeeDedArrear + totalNpsEmployerContArrear;
-            
+
             // COMBINED PRE-TAX ARREARS (Monthly Gross Arrears + LE)
             // Note: MonthlyPreTaxArrears ALREADY includes the NPS Employer Contribution difference as per the latest requirements.
             const totalCombinedPreTaxArrears = totalMonthlyPreTaxArrears + totalLeArrears;
-            
+
             // FINAL PAYABLE ARREARS (Subtract ALL retained contributions and tax from Gross Arrears)
             const totalArrearsRetained = totalNpsRetainedArrear; // Sum of both Employee Ded Diff and Employer Cont Diff
             const netArrearsPreTaxAndNPS = totalCombinedPreTaxArrears - totalArrearsRetained;
@@ -1212,7 +1267,7 @@
             monthlyOldNetTotal.textContent = totalOldNet;
             monthlyNewNetTotal.textContent = totalNewNet;
             monthlyNetDiffTotal.textContent = totalNetDiff; // This is the total monthly pre-tax arrears
-            
+
             // Final Arrears Display (POST-TAX)
             totalArrearsDisplay.textContent = `₹${f(totalPostTaxArrears)}`; // Added ₹ symbol
 
@@ -1238,15 +1293,15 @@
         function getArrearsData() {
             const startDate = new Date('2022-08-01');
             const endDate = new Date(); // Current date (month is included)
-            
+
             const arrearsCadreName = arrearsCadreSelect.value;
             const arrearsOldBasicOption = arrearsOldBasicSelect.options[arrearsOldBasicSelect.selectedIndex];
-            
+
             const selectedArrearsCadreData = salaryData[arrearsCadreName];
             if (!arrearsCadreName || arrearsOldBasicSelect.selectedIndex === -1 || !selectedArrearsCadreData) {
                 return [];
             }
-            
+
             let currentBasicOld = parseFloat(arrearsOldBasicOption.value);
             let currentBasicNew = parseFloat(arrearsOldBasicOption.dataset.newBasic);
             let currentCadre = arrearsCadreName;
@@ -1258,16 +1313,16 @@
             const nextIncrementYear = parseInt(nextIncrementYearSelect.value);
             const hasIncrement = !isNaN(nextIncrementMonth) && !isNaN(nextIncrementYear);
             let incrementDate = hasIncrement ? new Date(nextIncrementYear, nextIncrementMonth - 1, 1) : null;
-            
+
             // Promotion Logic Setup
             const promotionMonth = parseInt(promotionMonthSelect.value);
             const promotionYear = parseInt(promotionYearSelect.value);
             const promotedCadreName = promotedCadreSelect.value;
             const promotedOldBasicOption = promotedOldBasicSelect.options[promotedOldBasicSelect.selectedIndex];
-            
+
             const hasPromotion = !isNaN(promotionMonth) && !isNaN(promotionYear) && promotedCadreName && promotedOldBasicOption;
             const promotionDate = hasPromotion ? new Date(promotionYear, promotionMonth - 1, 1) : null;
-            
+
             // In-Charge Allowance Period Setup
             const inChargeFromMonth = parseInt(inChargeFromMonthSelect.value);
             const inChargeFromYear = parseInt(inChargeFromYearSelect.value);
@@ -1288,13 +1343,13 @@
             let isLeasedAccommodationSelected = false;
             let fpaOld = 0, fpaNew = 0;
             let otherAllowances = {};
-            
+
             const selectedFpaCadre = fpaCadreSelect.value;
             if (selectedFpaCadre in fpaData) {
                 fpaOld = fpaData[selectedFpaCadre].old;
                 fpaNew = fpaData[selectedFpaCadre].new;
             }
-            
+
             let entertainmentOld = 0, entertainmentNew = 0;
             let currentInChargeNoTransport = false;
             let hasMarketingAllowanceSelected = false; // Flag to track marketing allowance
@@ -1328,7 +1383,7 @@
 
             while (tempDate <= endDate) {
                 const monthString = `${tempDate.toLocaleString('default', { month: 'long' })} ${tempDate.getFullYear()}`;
-                
+
                 // 1. Check for Promotion
                 if (hasPromotion && promotionDate && tempDate.getFullYear() === promotionDate.getFullYear() && tempDate.getMonth() === promotionDate.getMonth()) {
                     currentBasicOld = parseFloat(promotedOldBasicOption.value);
@@ -1337,16 +1392,16 @@
                     const promotedCadreData = salaryData[currentCadre];
                     currentCategoryArrears = promotedCadreData.category;
                     currentNoTransport = promotedCadreData.noTransport || false; // Reset inherent transport rule
-                    
+
                     // Reset increment date to the promotion date anniversary (next year)
                     incrementDate = new Date(promotionDate.getFullYear() + 1, promotionDate.getMonth(), 1);
                 }
-                
+
                 // 2. Check for Annual Increment
                 if (incrementDate && tempDate.getFullYear() === incrementDate.getFullYear() && tempDate.getMonth() === incrementDate.getMonth()) {
                     const cadreMap = salaryData[currentCadre].payMap;
                     const oldBasicIndex = cadreMap.findIndex(p => p.old === currentBasicOld);
-                    
+
                     if (oldBasicIndex !== -1 && oldBasicIndex + 1 < cadreMap.length) {
                         const nextSlab = cadreMap[oldBasicIndex + 1];
                         currentBasicOld = nextSlab.old;
@@ -1358,11 +1413,11 @@
 
                 // 3. Determine if Transport Allowance is excluded this month due to In-charge status OR Marketing Allowance
                 const isTransportExcludedByMarketing = hasMarketingAllowanceSelected;
-                
-                const isTransportExcludedByInCharge = currentInChargeNoTransport && hasInChargePeriod && 
-                                                        tempDate.getFullYear() >= inChargeStartDate.getFullYear() && tempDate.getFullYear() <= inChargeEndDate.getFullYear() &&
-                                                        (tempDate.getFullYear() > inChargeStartDate.getFullYear() || tempDate.getMonth() >= inChargeStartDate.getMonth()) && 
-                                                        (tempDate.getFullYear() < inChargeEndDate.getFullYear() || tempDate.getMonth() <= inChargeUpToMonth - 1); // Up to month is exclusive in JS logic
+
+                const isTransportExcludedByInCharge = currentInChargeNoTransport && hasInChargePeriod &&
+                    tempDate.getFullYear() >= inChargeStartDate.getFullYear() && tempDate.getFullYear() <= inChargeEndDate.getFullYear() &&
+                    (tempDate.getFullYear() > inChargeStartDate.getFullYear() || tempDate.getMonth() >= inChargeStartDate.getMonth()) &&
+                    (tempDate.getFullYear() < inChargeEndDate.getFullYear() || tempDate.getMonth() <= inChargeUpToMonth - 1); // Up to month is exclusive in JS logic
 
                 // If Marketing is selected, it permanently removes transport regardless of In-Charge dates.
                 const isTransportExcluded = isTransportExcludedByMarketing || isTransportExcludedByInCharge;
@@ -1373,7 +1428,7 @@
                 // The fourth argument is the monthly/dynamic transport exclusion (isTransportExcluded)
                 const oldSal = calculateSalaryForMonth(currentBasicOld, city, false, isLeasedAccommodationSelected, currentCategoryArrears, currentNoTransport, tempDate, isTransportExcluded);
                 const newSal = calculateSalaryForMonth(currentBasicNew, city, true, isLeasedAccommodationSelected, currentCategoryArrears, currentNoTransport, tempDate, isTransportExcluded);
-                
+
                 // 5. Add FPA
                 oldSal.fpa = fpaOld;
                 newSal.fpa = fpaNew;
@@ -1381,7 +1436,7 @@
                 // 6. Add In-Charge/Entertainment Allowance for the effective period
                 oldSal.entertainment = isTransportExcludedByInCharge ? entertainmentOld : 0;
                 newSal.entertainment = isTransportExcludedByInCharge ? entertainmentNew : 0;
-                
+
                 // 7. Calculate Gross Totals (Pre-allowances/deductions)
                 let combinedOldSal = oldSal.basic + oldSal.da + oldSal.hra + oldSal.cca + oldSal.transport + oldSal.fpa + oldSal.entertainment;
                 let combinedNewSal = newSal.basic + newSal.da + newSal.hra + newSal.cca + newSal.transport + newSal.fpa + newSal.entertainment;
@@ -1389,11 +1444,11 @@
                 // 8. Calculate NPS Contribution differences
                 let oldEmployeeDed = 0;
                 let newEmployeeDed = 0;
-                let oldEmployerCont = 0; 
-                let newEmployerCont = 0; 
+                let oldEmployerCont = 0;
+                let newEmployerCont = 0;
 
                 const contributionType = contributionTypeSelect.value;
-                
+
                 if (contributionType === 'PF') {
                     // PF: 10% of Basic Pay (Employee only)
                     oldEmployeeDed = oldSal.basic * 0.10;
@@ -1402,14 +1457,14 @@
                     // NPS Employee Deduction: 10% of (Basic + DA)
                     oldEmployeeDed = (oldSal.basic + oldSal.da) * 0.10;
                     newEmployeeDed = (newSal.basic + newSal.da) * 0.10;
-                    
+
                     // NPS Employer Contribution: OLD 10%, NEW 14% of (Basic + DA)
                     oldEmployerCont = (oldSal.basic + oldSal.da) * 0.10;
                     newEmployerCont = (newSal.basic + newSal.da) * 0.14;
                 }
-                
+
                 // --- APPLY ALLOWANCES AND EMPLOYER CONTRIBUTION DIFFERENCE TO GROSS ---
-                
+
                 // Add fixed allowances
                 for (const name in otherAllowances) {
                     const allowanceData = universalAllowances[name];
@@ -1418,18 +1473,18 @@
 
                     // Apply the TQ Officer arrear exclusion if the condition is met
                     if (allowanceData && allowanceData.isOfficerTQ && tempDate < OFFICER_TQ_EFFECTIVE_DATE) {
-                         // Amounts are forced to 0 for monthly arrear data before the effective date
+                        // Amounts are forced to 0 for monthly arrear data before the effective date
                     } else {
                         combinedOldSal += oldAmount;
                         combinedNewSal += newAmount;
                     }
                 }
-                
+
                 // *** CRITICAL STEP: Include the difference in Employer Contribution in the GROSS ARREAR ***
                 // This difference (new employer contribution - old employer contribution) is part of the overall arrear money flow.
                 const employerContDiff = newEmployerCont - oldEmployerCont;
                 const monthlyGrossArrear = (combinedNewSal - combinedOldSal) + employerContDiff;
-                
+
                 // Calculate Net Payable Arrear (Money paid to employee + funds directed to PF/NPS Employee Deduction)
                 // This calculation is Gross Arrear minus the difference in Employee Deduction (if PF/NPS)
                 const employeeDedDiff = newEmployeeDed - oldEmployeeDed;
@@ -1443,16 +1498,16 @@
                     newBasic: newSal.basic,
                     oldDA: oldSal.da,
                     newDA: newSal.da,
-                    oldHRA: oldSal.hra, 
-                    newHRA: newSal.hra, 
-                    oldCCA: oldSal.cca, 
-                    newCCA: newSal.cca, 
-                    oldTransport: oldSal.transport, 
-                    newTransport: newSal.transport, 
-                    oldFPA: oldSal.fpa, 
-                    newFPA: newSal.fpa, 
-                    oldEntertainment: oldSal.entertainment, 
-                    newEntertainment: newSal.entertainment, 
+                    oldHRA: oldSal.hra,
+                    newHRA: newSal.hra,
+                    oldCCA: oldSal.cca,
+                    newCCA: newSal.cca,
+                    oldTransport: oldSal.transport,
+                    newTransport: newSal.transport,
+                    oldFPA: oldSal.fpa,
+                    newFPA: newSal.fpa,
+                    oldEntertainment: oldSal.entertainment,
+                    newEntertainment: newSal.entertainment,
 
                     // Totals & Contribution
                     oldDeduction: oldEmployeeDed, // Employee Contribution (10%)
@@ -1464,9 +1519,9 @@
                     monthlyIncrease: monthlyIncrease, // Monthly Arrear (Net Increase + Employer Diff)
                     netOld: combinedOldSal - oldEmployeeDed,
                     netNew: combinedNewSal - newEmployeeDed,
-                    
+
                     // Store details including TQ Officer values for the CSV header definition
-                    details: {...otherAllowances}
+                    details: { ...otherAllowances }
                 });
 
                 // Move to the next month
@@ -1480,21 +1535,21 @@
             // --- 1. Current Salary Calculation (Top Section) ---
             const currentCadreName = cadreSelect.value;
             const currentSelectedOption = oldBasicSelect.options[oldBasicSelect.selectedIndex];
-            
+
             if (!currentCadreName || oldBasicSelect.selectedIndex === -1 || !salaryData[currentCadreName] || !currentSelectedOption) {
                 // Reset main display if inputs are invalid
                 oldGrossTotalDisplay.textContent = 'N/A';
                 newGrossTotalDisplay.textContent = 'N/A';
                 grossTotalIncreaseDisplay.textContent = 'N/A';
                 grossTotalGrowthDisplay.textContent = 'N/A';
-                comparisonBody.innerHTML = ''; 
+                comparisonBody.innerHTML = '';
             } else {
                 const currentCadreData = salaryData[currentCadreName];
                 const currentCategory = currentCadreData.category;
                 const currentOldBasic = parseFloat(currentSelectedOption.value);
                 const currentNewBasic = parseFloat(currentSelectedOption.dataset.newBasic);
                 newBasicDisplay.textContent = currentNewBasic.toLocaleString('en-IN');
-                
+
                 const city = citySelect.value;
                 let isLeasedAccommodationSelected = false;
                 let noTransportFlag = currentCadreData.noTransport || false; // Inherent cadre rule
@@ -1508,14 +1563,14 @@
                     fpaOld = fpaData[selectedFpaCadre].old;
                     fpaNew = fpaData[selectedFpaCadre].new;
                 }
-                
+
                 document.querySelectorAll('.allowance-checkbox:checked').forEach(cb => {
                     const allowanceName = cb.nextElementSibling.textContent;
                     const oldAmount = parseFloat(cb.dataset.oldAmount);
                     const newAmount = parseFloat(cb.dataset.newAmount);
 
                     if (cb.dataset.isLeasedAccommodation === 'true') isLeasedAccommodationSelected = true;
-                    
+
                     // Check if this allowance disables transport (for both in-charge and marketing)
                     if (cb.dataset.noTransport === 'true') {
                         hasAllowanceDisablingTransport = true;
@@ -1524,7 +1579,7 @@
                     if (cb.dataset.isEntertainment === 'true') {
                         entertainmentOld += oldAmount;
                         entertainmentNew += newAmount;
-                        
+
                     } else {
                         // All other allowances (including Marketing Functions) - Full current amount used for comparison
                         otherAllowances[allowanceName] = { old: oldAmount, new: newAmount };
@@ -1535,11 +1590,11 @@
                 if (hasAllowanceDisablingTransport) {
                     noTransportFlag = true;
                 }
-                
+
                 // Pass false for excludeTransport here because the flag is already handled by noTransportFlag
                 const oldSal = calculateSalaryForMonth(currentOldBasic, city, false, isLeasedAccommodationSelected, currentCategory, noTransportFlag, new Date(), false);
                 const newSal = calculateSalaryForMonth(currentNewBasic, city, true, isLeasedAccommodationSelected, currentCategory, noTransportFlag, new Date(), false);
-                
+
                 oldSal.entertainment = entertainmentOld;
                 newSal.entertainment = entertainmentNew;
                 oldSal.fpa = fpaOld;
@@ -1563,17 +1618,17 @@
             // --- 2. Arrears Calculation (Bottom Section) ---
             const arrearsData = getArrearsData();
             let totalMonthlyPreTaxArrears = 0; // This now includes the Employer NPS Contribution difference
-            
+
             if (arrearsData.length > 0) {
                 totalMonthlyPreTaxArrears = arrearsData.reduce((sum, item) => sum + item.monthlyIncrease, 0);
             }
-            
+
             // --- 3. Leave Encashment Arrears Calculation ---
             const totalLeArrears = calculateLeaveEncashmentArrears(arrearsData);
-            
+
             // --- 4. Final Totals and Tax Application ---
             const totalCombinedPreTaxArrears = totalMonthlyPreTaxArrears + totalLeArrears;
-            
+
             // Calculate NPS retained amount for final payable deduction
             let totalNpsEmployeeDedArrear = 0;
             let totalNpsEmployerContArrear = 0;
@@ -1585,11 +1640,11 @@
 
             // Apply Tax and NPS deduction for the FINAL PAYABLE amount
             const taxRate = parseFloat(annualTaxRateSelect.value);
-            
+
             // Tax is applied to Gross Arrear (Monthly Net + LE) MINUS ALL NPS RETAINED ARREARS
             const netArrearsPreTaxAndNPS = totalCombinedPreTaxArrears - totalNpsRetainedArrear;
             const finalTaxDeducted = netArrearsPreTaxAndNPS * taxRate;
-            
+
             // Final Arrear is the Gross Arrear (Monthly Net + LE) MINUS ALL NPS RETAINED ARREARS MINUS TAX
             const totalPostTaxArrears = netArrearsPreTaxAndNPS - finalTaxDeducted;
 
@@ -1602,8 +1657,8 @@
                 arrearsMonthsDisplay.textContent = 'N/A';
                 totalArrearsDisplay.textContent = '₹0';
                 monthlyArrearsSection.classList.add('hidden');
-                
-                preTaxArrearsDisplay.textContent = '0.00'; 
+
+                preTaxArrearsDisplay.textContent = '0.00';
                 leArrearsSummaryDisplay.textContent = '0.00';
                 combinedPreTaxArrearsDisplay.textContent = '0.00';
                 taxDeductedDisplay.textContent = '0.00';
@@ -1617,12 +1672,12 @@
             const data = getArrearsData();
             if (data.length === 0) {
                 showMessage("Please select the initial Cadre and Basic Pay for the arrears calculation section.");
-                return; 
+                return;
             }
-            
+
             const contributionType = contributionTypeSelect.value;
             const totalMonthlyPreTaxArrears = data.reduce((sum, item) => sum + item.monthlyIncrease, 0);
-            
+
             // Include Leave Encashment Calculation in export summary
             const totalLeArrears = calculateLeaveEncashmentArrears(data);
             const totalCombinedPreTaxArrears = totalMonthlyPreTaxArrears + totalLeArrears;
@@ -1644,7 +1699,7 @@
 
             // 1. Determine Dynamic Headers for Monthly Breakdown
             const staticComponentHeaders = ['Month', 'Old Basic Pay', 'New Basic Pay', 'Old DA', 'New DA', 'Old HRA', 'New HRA', 'Old CCA', 'New CCA', 'Old Transport', 'New Transport', 'Old FPA', 'New FPA', 'Old Entertainment', 'New Entertainment'];
-            
+
             const allowanceNames = new Set();
             data.forEach(item => {
                 Object.keys(item.details).forEach(name => {
@@ -1665,29 +1720,29 @@
             let staticTotalsHeaders;
             if (contributionType === 'NPS') {
                 staticTotalsHeaders = [
-                    'Old Gross', 'New Gross', 'Gross Diff', 
-                    `Old NPS Employee Ded. (10%)`, `New NPS Employee Ded. (10%)`, `Employee Ded. Diff`, 
-                    `Old NPS Employer Cont. (10%)`, `New NPS Employer Cont. (14%)`, `Employer Cont. Diff`, 
+                    'Old Gross', 'New Gross', 'Gross Diff',
+                    `Old NPS Employee Ded. (10%)`, `New NPS Employee Ded. (10%)`, `Employee Ded. Diff`,
+                    `Old NPS Employer Cont. (10%)`, `New NPS Employer Cont. (14%)`, `Employer Cont. Diff`,
                     'Old Net', 'New Net', 'Net Arrears (Diff in Monthly Take Home + Employer Cont Diff)'
                 ];
             } else {
                 staticTotalsHeaders = [
-                    'Old Gross', 'New Gross', 'Gross Diff', 
-                    `Old PF Ded. (10%)`, `New PF Ded. (10%)`, `Ded. Diff`, 
+                    'Old Gross', 'New Gross', 'Gross Diff',
+                    `Old PF Ded. (10%)`, `New PF Ded. (10%)`, `Ded. Diff`,
                     'Old Net', 'New Net', 'Net Arrears (Final)'
                 ];
             }
-            
+
             const dynamicHeaders = [...staticComponentHeaders, ...dynamicAllowanceHeaders, ...staticTotalsHeaders];
-            
+
             // 2. Generate Metadata Header 
             let csvContent = `GIPSA Arrears Calculation Breakdown (Effective 01/08/2022)\n`;
             csvContent += `Input Cadre: ${arrearsCadreSelect.value}, Initial Basic Pay: ${arrearsOldBasicSelect.value}, Contribution Type: ${contributionType}\n`;
             csvContent += `Total Months (Monthly Arrears): ${data.length}\n`;
-            csvContent += `Total Monthly Arrears (Net + Employer Diff): ${totalMonthlyPreTaxArrears.toFixed(2)}\n`; 
-            csvContent += `Total Leave Encashment Arrears: ${totalLeArrears.toFixed(2)}\n`; 
-            csvContent += `Total Gross Arrears (Monthly + LE): ${totalCombinedPreTaxArrears.toFixed(2)}\n`; 
-            
+            csvContent += `Total Monthly Arrears (Net + Employer Diff): ${totalMonthlyPreTaxArrears.toFixed(2)}\n`;
+            csvContent += `Total Leave Encashment Arrears: ${totalLeArrears.toFixed(2)}\n`;
+            csvContent += `Total Gross Arrears (Monthly + LE): ${totalCombinedPreTaxArrears.toFixed(2)}\n`;
+
             if (contributionType === 'NPS') {
                 csvContent += `--- NPS ARREAR ADJUSTMENTS ---\n`;
                 csvContent += `Total Employee NPS Ded. Arrear (10% Diff): ${totalNpsEmployeeDedArrear.toFixed(2)}\n`;
@@ -1695,50 +1750,50 @@
                 csvContent += `Total NPS Arrears Retained (Subtracted from Payable Amount): ${totalNpsRetainedArrear.toFixed(2)}\n`;
                 csvContent += `Net Arrears BEFORE Tax (Payable - Retained NPS Funds): ${netArrearsPreTaxAndNPS.toFixed(2)}\n`;
             }
-            
+
             csvContent += `Tax Rate Applied: ${(taxRate * 100).toFixed(0)}%, Tax Deducted: ${taxDeducted.toFixed(2)}\n`;
-            csvContent += `Total NET PAYABLE Arrears (After NPS Adjustments and Tax): ${totalPostTaxArrears.toFixed(2)}\n\n`; 
-            
+            csvContent += `Total NET PAYABLE Arrears (After NPS Adjustments and Tax): ${totalPostTaxArrears.toFixed(2)}\n\n`;
+
             // 3. Generate Monthly Table Headers (Row 10 in Excel)
             csvContent += "--- MONTHLY ARREARS BREAKDOWN ---\n"; // Row 9
             csvContent += dynamicHeaders.map(h => `"${h}"`).join(',') + '\n'; // Row 10
-            
+
             // 4. Generate Data Rows
             const dataStartRowInExcel = 12; // Start Row for monthly data
             let currentRowInExcel = dataStartRowInExcel;
-            
+
             data.forEach(item => {
                 const rowData = [
                     item.month,
-                    item.oldBasic.toFixed(2), 
+                    item.oldBasic.toFixed(2),
                     item.newBasic.toFixed(2),
                     item.oldDA.toFixed(2),
                     item.newDA.toFixed(2),
-                    item.oldHRA.toFixed(2), 
-                    item.newHRA.toFixed(2), 
-                    item.oldCCA.toFixed(2), 
-                    item.newCCA.toFixed(2), 
-                    item.oldTransport.toFixed(2), 
-                    item.newTransport.toFixed(2), 
-                    item.oldFPA.toFixed(2), 
-                    item.newFPA.toFixed(2), 
-                    item.oldEntertainment.toFixed(2), 
+                    item.oldHRA.toFixed(2),
+                    item.newHRA.toFixed(2),
+                    item.oldCCA.toFixed(2),
+                    item.newCCA.toFixed(2),
+                    item.oldTransport.toFixed(2),
+                    item.newTransport.toFixed(2),
+                    item.oldFPA.toFixed(2),
+                    item.newFPA.toFixed(2),
+                    item.oldEntertainment.toFixed(2),
                     item.newEntertainment.toFixed(2)
                 ];
 
                 allowanceNames.forEach(name => {
                     const allowanceData = item.details[name];
                     const fullAllowanceData = universalAllowances[name.replace(/Old|New/g, '').trim()]; // Get original allowance data
-                    
+
                     let oldAmount = allowanceData ? allowanceData.old : 0;
                     let newAmount = allowanceData ? allowanceData.new : 0;
 
                     // Apply the TQ Officer arrear exclusion if the condition is met
                     if (fullAllowanceData && fullAllowanceData.isOfficerTQ && new Date(item.month.replace(/ /g, ' 1, ')) < OFFICER_TQ_EFFECTIVE_DATE) {
-                         oldAmount = 0;
-                         newAmount = 0;
+                        oldAmount = 0;
+                        newAmount = 0;
                     }
-                    
+
                     rowData.push(oldAmount.toFixed(2));
                     rowData.push(newAmount.toFixed(2));
                 });
@@ -1752,10 +1807,10 @@
                     item.newDeduction.toFixed(2), // Employee Ded. New
                     (item.newDeduction - item.oldDeduction).toFixed(2) // Employee Ded. Diff
                 );
-                
+
                 // Add NPS Employer Contribution columns if applicable
                 if (contributionType === 'NPS') {
-                     rowData.push(
+                    rowData.push(
                         item.oldEmployerCont.toFixed(2), // Employer Cont. Old
                         item.newEmployerCont.toFixed(2), // Employer Cont. New
                         (item.newEmployerCont - item.oldEmployerCont).toFixed(2) // Employer Cont. Diff
@@ -1768,15 +1823,15 @@
                     item.netNew.toFixed(2), // New Net
                     item.monthlyIncrease.toFixed(2) // Net Arrears (Diff in Monthly Take Home + Employer Cont Diff)
                 );
-                
+
                 csvContent += rowData.map(v => `"${v}"`).join(',') + '\n';
                 currentRowInExcel++;
             });
-            
+
             // 5. Append Monthly Grand Totals with SUM formulas
             csvContent += "\n--- MONTHLY GRAND TOTALS ---\n"; // Row N+2
             csvContent += dynamicHeaders.map(h => `"${h}"`).join(',') + '\n'; // Row N+3
-            
+
             const sumRowData = ["**TOTAL**"];
             const startRow = dataStartRowInExcel; // Row 12 in Excel (where data starts)
             const endRow = currentRowInExcel - 1; // Last data row number in Excel (dynamically determined)
@@ -1795,47 +1850,47 @@
             // Iterate through every column that requires summation (starting from index 1, skipping 'Month')
             for (let i = 1; i < dynamicHeaders.length; i++) {
                 const colLetter = getColLetter(i);
-                
+
                 // Construct the SUM formula: =SUM(B12:B[End Row])
                 const sumFormula = `=SUM(${colLetter}${startRow}:${colLetter}${endRow})`;
                 sumRowData.push(sumFormula);
             }
-            
+
             csvContent += sumRowData.map(v => `"${v}"`).join(',') + '\n';
 
             // 6. Append LEAVE ENCASHMENT DETAILS (New dedicated section)
             csvContent += "\n--- LEAVE ENCASHMENT ARREARS CALCULATION DETAILS ---\n";
             csvContent += "Instance,Date From,Date To,Days Encashment,Old LE Base (B+D+F+H+C),New LE Base (B+D+F+H+C),Arrear Amount (per instance)\n";
-            
+
             leInputs.forEach((instance, index) => {
                 const days = parseInt(instance.days.value) || 0;
                 const start = instance.start.value;
-                
+
                 let oldLEBase = 0;
                 let newLEBase = 0;
-                let finalArrear = 0; 
-                
+                let finalArrear = 0;
+
                 if (start && days > 0) {
                     const encashmentDate = new Date(start);
-                    
+
                     const startMonthIndex = data.findIndex(item => {
                         const itemDate = new Date(item.month.replace(/ /g, ' 1, '));
                         return encashmentDate.getFullYear() === itemDate.getFullYear() && encashmentDate.getMonth() === encashmentDate.getMonth();
                     });
 
                     if (startMonthIndex !== -1) {
-                         const monthData = data[startMonthIndex];
-                         
-                         // Calculate the full LE Base as per the monthly data's components
-                         oldLEBase = monthData.oldBasic + monthData.oldDA + monthData.oldFPA + monthData.oldHRA + monthData.oldCCA;
-                         newLEBase = monthData.newBasic + monthData.newDA + monthData.newFPA + monthData.newHRA + monthData.newCCA;
-                         
-                         // The calculation is: (Monthly Diff / 30) * Days
-                         finalArrear = ((newLEBase - oldLEBase) / 30.0) * Math.min(days, 15);
+                        const monthData = data[startMonthIndex];
+
+                        // Calculate the full LE Base as per the monthly data's components
+                        oldLEBase = monthData.oldBasic + monthData.oldDA + monthData.oldFPA + monthData.oldHRA + monthData.oldCCA;
+                        newLEBase = monthData.newBasic + monthData.newDA + monthData.newFPA + monthData.newHRA + monthData.newCCA;
+
+                        // The calculation is: (Monthly Diff / 30) * Days
+                        finalArrear = ((newLEBase - oldLEBase) / 30.0) * Math.min(days, 15);
                     }
                 }
-                
-                csvContent += `${index + 1},${start || "N/A"},${"N/A"},${Math.min(days, 15)},${oldLEBase.toFixed(2)},${newLEBase.toFixed(2)},${finalArrear.toFixed(2)}\n`; 
+
+                csvContent += `${index + 1},${start || "N/A"},${"N/A"},${Math.min(days, 15)},${oldLEBase.toFixed(2)},${newLEBase.toFixed(2)},${finalArrear.toFixed(2)}\n`;
             });
             csvContent += `\nTOTAL LEAVE ENCASHMENT ARREARS (pre-tax),,,,,,${totalLeArrears.toFixed(2)}\n`;
 
@@ -1858,15 +1913,15 @@
             populateCadreDropdowns();
             populateYearDropdowns();
             populateMonthDropdowns();
-            
+
             // Set initial defaults for demonstration and immediate functionality
             cadreSelect.value = "Assistant";
             annualTaxRateSelect.value = "0.20"; // Default arrears tax to 20%
             updateAllowances();
-            
+
             // For arrears, default to the main selection's starting points
             arrearsCadreSelect.value = "Assistant";
-            
+
             // Set date limits for LE inputs
             const todayYMD = dateToYMD(TODAY);
             leInputs.forEach(instance => {
@@ -1875,16 +1930,16 @@
 
             // Add all listeners
             const elementsToRecalculate = [
-                cadreSelect, oldBasicSelect, citySelect, fpaCadreSelect, 
-                arrearsCadreSelect, arrearsOldBasicSelect, nextIncrementMonthSelect, nextIncrementYearSelect, 
+                cadreSelect, oldBasicSelect, citySelect, fpaCadreSelect,
+                arrearsCadreSelect, arrearsOldBasicSelect, nextIncrementMonthSelect, nextIncrementYearSelect,
                 promotionMonthSelect, promotionYearSelect, promotedCadreSelect, promotedOldBasicSelect,
-                contributionTypeSelect, annualTaxRateSelect, 
-                inChargeFromMonthSelect, inChargeFromYearSelect, 
+                contributionTypeSelect, annualTaxRateSelect,
+                inChargeFromMonthSelect, inChargeFromYearSelect,
                 inChargeUpToMonthSelect, inChargeUpToYearSelect
             ];
 
             elementsToRecalculate.forEach(el => el.addEventListener('change', calculateAndDisplay));
-            
+
             // Add listeners for Leave Encashment inputs
             leInputs.forEach(instance => {
                 instance.start.addEventListener('change', calculateAndDisplay);
@@ -1901,13 +1956,13 @@
 
             promotedCadreSelect.addEventListener('change', populatePromotedBasicDropdown);
             promotedOldBasicSelect.addEventListener('change', updatePromotedBasicDisplay);
-            
+
             allowancesContainer.addEventListener('change', (e) => {
                 if (e.target.classList.contains('allowance-checkbox')) {
                     calculateAndDisplay();
                 }
             });
-            
+
             exportBtn.addEventListener('click', exportToCsv);
 
             // Final initial calculation
@@ -1919,5 +1974,7 @@
 
         initialize();
     </script>
+
 </body>
+
 </html>
